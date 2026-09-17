@@ -70,6 +70,8 @@ impl TerminalRunner {
                     id: term.clone(),
                     name: format!("Default Terminal ({})", term),
                     command: term,
+                    exe_path: None,
+                    term_type: Some("builtin".to_string()),
                     is_default: true,
                 });
             } else {
@@ -77,6 +79,8 @@ impl TerminalRunner {
                     id: "gnome-terminal".to_string(),
                     name: "GNOME Terminal".to_string(),
                     command: "gnome-terminal".to_string(),
+                    exe_path: None,
+                    term_type: Some("builtin".to_string()),
                     is_default: true,
                 });
             }
@@ -84,6 +88,8 @@ impl TerminalRunner {
                 id: "xterm".to_string(),
                 name: "XTerm".to_string(),
                 command: "xterm".to_string(),
+                exe_path: None,
+                term_type: Some("builtin".to_string()),
                 is_default: false,
             });
             list
@@ -96,12 +102,16 @@ impl TerminalRunner {
                     id: "terminal".to_string(),
                     name: "Terminal.app".to_string(),
                     command: "Terminal".to_string(),
+                    exe_path: None,
+                    term_type: Some("builtin".to_string()),
                     is_default: true,
                 },
                 TerminalInfo {
                     id: "iterm".to_string(),
                     name: "iTerm2".to_string(),
                     command: "iTerm".to_string(),
+                    exe_path: None,
+                    term_type: Some("builtin".to_string()),
                     is_default: false,
                 },
             ]
@@ -178,7 +188,7 @@ impl TerminalRunner {
                     Command::new(&term)
                         .args([
                             "--working-directory",
-                            dir,
+                            target_dir,
                             "--",
                             "bash",
                             "-c",
@@ -193,7 +203,7 @@ impl TerminalRunner {
                             "-c",
                             &format!(
                                 "cd '{}' && xterm -e 'bash -c \"{}; exec bash\"'",
-                                dir, command
+                                target_dir, command
                             ),
                         ])
                         .spawn()
@@ -206,7 +216,7 @@ impl TerminalRunner {
         {
             let applescript = format!(
                 "tell application \"Terminal\" to do script \"cd '{}' && {}\"",
-                dir,
+                target_dir,
                 command.replace('"', "\\\"")
             );
             Command::new("osascript")
@@ -267,7 +277,7 @@ impl TerminalRunner {
         #[cfg(not(target_os = "windows"))]
         {
             let output = Command::new("bash")
-                .args(["-c", &format!("cd '{}' && {}", dir, command)])
+                .args(["-c", &format!("cd '{}' && {}", target_dir, command)])
                 .output()
                 .map_err(|e| e.to_string())?;
 
