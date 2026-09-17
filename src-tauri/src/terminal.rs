@@ -119,7 +119,7 @@ impl TerminalRunner {
     }
 
     pub fn run_in_external_terminal(
-        terminal_id: &str,
+        _terminal_id: &str,
         command: &str,
         working_dir: Option<&str>,
     ) -> Result<(), String> {
@@ -134,7 +134,7 @@ impl TerminalRunner {
             use std::os::windows::process::CommandExt;
             const CREATE_NEW_CONSOLE: u32 = 0x00000010;
 
-            match terminal_id {
+            match _terminal_id {
                 "powershell" => {
                     let mut cmd = Command::new("powershell.exe");
                     cmd.current_dir(target_dir);
@@ -164,10 +164,10 @@ impl TerminalRunner {
 
         #[cfg(target_os = "linux")]
         {
-            let term = if terminal_id.is_empty() || terminal_id == "default" {
+            let term = if _terminal_id.is_empty() || _terminal_id == "default" {
                 std::env::var("TERMINAL").unwrap_or_else(|_| "x-terminal-emulator".to_string())
             } else {
-                terminal_id.to_string()
+                _terminal_id.to_string()
             };
 
             match term.as_str() {
@@ -229,7 +229,7 @@ impl TerminalRunner {
     }
 
     pub fn execute_and_capture(
-        terminal_id: &str,
+        _terminal_id: &str,
         command: &str,
         working_dir: Option<&str>,
     ) -> Result<ExecutionResult, String> {
@@ -242,7 +242,7 @@ impl TerminalRunner {
 
         #[cfg(target_os = "windows")]
         {
-            let output = if terminal_id == "powershell" {
+            let output = if _terminal_id == "powershell" {
                 let mut cmd = Command::new("powershell.exe");
                 cmd.current_dir(target_dir);
                 cmd.args([
