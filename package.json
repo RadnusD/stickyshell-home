@@ -4,6 +4,7 @@
   "description": "StickyShell Home - Lightweight Cross-Platform Sticky Note",
   "private": true,
   "scripts": {
+    "tauri": "tauri",
     "start": "tauri dev",
     "dev": "tauri dev",
     "build:frontend": "node scripts/build-frontend.js",
