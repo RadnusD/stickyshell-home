@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickyShell Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Header -->
+    <header class="settings-header">
+      <div class="header-left">
+        <h2>StickyShell Home Settings</h2>
+        <span class="settings-subtitle">Manage preferences, terminal launchers, and hotkeys</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="settings-nav">
+      <button class="tab-btn active" data-tab="tab-general">Preferences</button>
+      <button class="tab-btn" data-tab="tab-guide">UI & Shortcuts Guide</button>
+      <button class="tab-btn" data-tab="tab-compare">Compare Editions</button>
+      <button class="tab-btn" data-tab="tab-about">About</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="settings-content">
+
+      <!-- TAB 1: General Preferences -->
+      <section id="tab-general" class="tab-pane active">
+        <div class="edition-status-card" id="edition-status-card">
+          <div class="edition-status-header">
+            <div>
+              <span class="edition-current-label">CURRENT EDITION</span>
+              <h3 id="edition-title-text">StickyShell Home Edition</h3>
+            </div>
+          </div>
+          <p id="edition-desc-text" class="edition-status-desc">
+            You are running StickyShell Home Edition with classic yellow notes, persistent undo buffer, and native shell execution.
+          </p>
+        </div>
+
+        <div class="section-intro" style="margin-top: 20px;">
+          <h3>Preferences & Behavior</h3>
+          <p>Configure default behaviors and shortcuts:</p>
+        </div>
+
+        <div class="prefs-group">
+          <div class="pref-item">
+            <div class="pref-info">
+              <label class="pref-title">Global OS Hotkeys</label>
+              <p class="pref-desc">
+                <code>Win+Alt+S</code>: Show / hide all notes anywhere in Windows.<br>
+                <code>Win+Alt+N</code>: Create new note anywhere in Windows.
+              </p>
+            </div>
+            <input type="checkbox" id="chk-global-hotkeys" class="pref-checkbox">
+          </div>
+
+          <div class="pref-item">
+            <div class="pref-info">
+              <label class="pref-title">Confirm Before Deleting Notes</label>
+              <p class="pref-desc">Prompt with a confirmation dialog before sending a note to the Undo Delete buffer.</p>
+            </div>
+            <input type="checkbox" id="chk-confirm-delete" class="pref-checkbox">
+          </div>
+        </div>
+
+        <div class="section-intro" style="margin-top: 20px;">
+          <h3>Default Run Options (New Notes)</h3>
+          <p>Set defaults applied to all newly created notes (individual notes maintain their own settings):</p>
+        </div>
+
+        <div class="prefs-group">
+          <div class="pref-item">
+            <div class="pref-info">
+              <label class="pref-title">Default Execution Mode</label>
+              <p class="pref-desc">Choose between capturing output inline or launching an external terminal window.</p>
+            </div>
+            <select id="sel-default-run-mode" class="pref-select">
+              <option value="capture">Capture Output (Inline Drawer)</option>
+              <option value="external">External Terminal Window</option>
+            </select>
+          </div>
+
+          <div class="pref-item">
+            <div class="pref-info">
+              <label class="pref-title">Default Terminal Shell</label>
+              <p class="pref-desc">The shell executable assigned to new sticky notes.</p>
+            </div>
+            <select id="sel-default-terminal" class="pref-select">
+              <!-- Populated dynamically with available terminals -->
+            </select>
+          </div>
+
+          <div class="pref-item">
+            <div class="pref-info">
+              <label class="pref-title">Default Working Directory</label>
+              <p class="pref-desc">The default folder where commands run (default is user profile home directory).</p>
+            </div>
+            <div class="pref-folder-controls">
+              <span id="lbl-default-folder" class="pref-path-display" title="User Default Directory">Default (User Dir)</span>
+              <button id="btn-browse-default-folder" class="btn-secondary-pill">Browse...</button>
+              <button id="btn-reset-default-folder" class="btn-secondary-pill hidden" title="Reset to default user home">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: UI & Shortcuts Guide -->
+      <section id="tab-guide" class="tab-pane">
+        <div class="section-intro">
+          <h3>StickyShell Controls & Header UI Layout</h3>
+          <p>Visual map and functional reference for all controls and shortcuts:</p>
+        </div>
+
+        <div class="cards-grid">
+          <!-- 1. Run in Menu (1st box) -->
+          <div class="guide-card">
+            <div class="card-icon run-icon">▶</div>
+            <div class="card-info">
+              <h4>Run Command Execution</h4>
+              <span class="location-badge highlight-green">Menu Item</span>
+              <p>Execute shell commands directly in your chosen terminal.</p>
+              <ul class="feature-bullets">
+                <li>Click <strong>Run</strong> in 3-dot menu (or press <code>Ctrl+Enter</code>): Instant execution</li>
+                <li>Click <strong>Run Options</strong>: Opens folder & terminal picker flyout</li>
+                <li>Dual Execution: Run inline console drawer or launch external terminal</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 2. Plus Button (New Note) -->
+          <div class="guide-card">
+            <div class="card-icon plus-icon">＋</div>
+            <div class="card-info">
+              <h4>New Note</h4>
+              <span class="location-badge">Header Item</span>
+              <p>Spawns an independent, frameless sticky note with its own working folder and persistent undo buffer.</p>
+              <ul class="feature-bullets">
+                <li>Shortcut: <code>＋</code> button or tray menu</li>
+                <li>Restored automatically upon next system restart</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 3. Pin Button -->
+          <div class="guide-card">
+            <div class="card-icon menu-icon" style="background:#fee2e2;color:#dc2626;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="17" x2="12" y2="22"></line>
+                <path d="M5 17h14v-2l-2-2V5a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v8l-2 2v2z"></path>
+                <circle cx="12" cy="3" r="1"></circle>
+              </svg>
+            </div>
+            <div class="card-info">
+              <h4>Pin to Top (Always on Top)</h4>
+              <span class="location-badge">Header Item</span>
+              <p>Pins the current sticky note above all other operating system windows.</p>
+              <ul class="feature-bullets">
+                <li>Visual Indicator: Turns vibrant red when active</li>
+                <li>State is saved automatically per note</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 4. Delete Button -->
+          <div class="guide-card">
+            <div class="card-icon delete-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </div>
+            <div class="card-info">
+              <h4>Delete Note & Undo Buffer</h4>
+              <span class="location-badge">Header Item</span>
+              <p>Closes and moves the note to the safe Undo Buffer with confirmation safety.</p>
+              <ul class="feature-bullets">
+                <li>Undo: Open 3-dot menu and click <strong>Undo Delete</strong></li>
+                <li>Permanent deletion only when cleared</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 5. Three-Dot Menu -->
+          <div class="guide-card">
+            <div class="card-icon menu-icon">⋮</div>
+            <div class="card-info">
+              <h4>Three-Dot Context Menu</h4>
+              <span class="location-badge">Header Item</span>
+              <p>Access notes management, undo buffer, settings, and application controls.</p>
+            </div>
+          </div>
+
+          <!-- 6. Close Button -->
+          <div class="guide-card">
+            <div class="card-icon close-icon">✕</div>
+            <div class="card-info">
+              <h4>Close Window</h4>
+              <span class="location-badge">Header Item</span>
+              <p>Hides the note while keeping StickyShell active in the system tray.</p>
+              <ul class="feature-bullets">
+                <li>Zero data loss: content is auto-saved before closing</li>
+                <li>Re-open anytime from the Windows Taskbar Notification area</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 7. System Tray -->
+          <div class="guide-card">
+            <div class="card-icon tray-icon">⚡</div>
+            <div class="card-info">
+              <h4>System Tray Notification Area</h4>
+              <span class="location-badge">Taskbar Notification Tray</span>
+              <p>StickyShell runs silently in the background.</p>
+              <ul class="feature-bullets">
+                <li>Right-click tray: Restore all notes, New note, Settings, Exit</li>
+                <li>Left-click tray: Instantly summon or hide all sticky notes</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Compare Editions -->
+      <section id="tab-compare" class="tab-pane">
+        <div class="section-intro">
+          <h3>StickyShell Edition Comparison</h3>
+          <p>Feature comparison between Home Edition and Developer Edition:</p>
+        </div>
+
+        <div class="compare-table-wrapper">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th class="col-feature">Feature / Capability</th>
+                <th class="col-edition col-home">
+                  <span class="edition-pill current-pill">CURRENT</span>
+                  <div class="edition-name">StickyShell Home</div>
+                  <div class="edition-sub">Essential & Offline</div>
+                </th>
+                <th class="col-edition col-dev">
+                  <span class="edition-pill pro-pill">PRO / DEV</span>
+                  <div class="edition-name">Developer Edition</div>
+                  <div class="edition-sub">DevOps & Automation</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Note Color Themes</span>
+                  <span class="feature-detail">Visual styles, dark modes, and color options</span>
+                </td>
+                <td class="val-home"><span class="badge-plain">Classic Yellow</span></td>
+                <td class="val-dev"><span class="badge-pro">6 Themes (Dark, Cyberpunk, Nord...)</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Note Transparency</span>
+                  <span class="feature-detail">Adjustable opacity slider per note</span>
+                </td>
+                <td class="val-home"><span class="badge-off">—</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Custom Opacity Slider</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Terminal Shells</span>
+                  <span class="feature-detail">Command-line environments available</span>
+                </td>
+                <td class="val-home"><span class="badge-on">CMD & PowerShell</span></td>
+                <td class="val-dev"><span class="badge-pro">CMD, PS, Git Bash, WSL & Custom</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Dual Run Modes</span>
+                  <span class="feature-detail">Inline drawer (▶) and external console (👁)</span>
+                </td>
+                <td class="val-home"><span class="badge-on">✓ Included</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Included</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">DevOps Snippet Library</span>
+                  <span class="feature-detail">Docker, K8s, Git, NPM templates with {{PARAM}}</span>
+                </td>
+                <td class="val-home"><span class="badge-off">—</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Full Library + Custom Snippets</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Safety Execution Guard</span>
+                  <span class="feature-detail">Intercepts destructive commands before running</span>
+                </td>
+                <td class="val-home"><span class="badge-off">—</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Real-time Safety Guard</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Secret & Token Masking</span>
+                  <span class="feature-detail">Auto-redact passwords & API keys from logs</span>
+                </td>
+                <td class="val-home"><span class="badge-off">—</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Regex Credential Masking</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Office & Rich Tables</span>
+                  <span class="feature-detail">Formatting, LaTeX formulas, Word interop</span>
+                </td>
+                <td class="val-home"><span class="badge-on">Markdown & LaTeX Math</span></td>
+                <td class="val-dev"><span class="badge-pro">Markdown, LaTeX + MS Word Tables</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Persistent Undo Buffer</span>
+                  <span class="feature-detail">Ctrl+Z restoration of accidentally closed notes</span>
+                </td>
+                <td class="val-home"><span class="badge-on">✓ Included</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Included</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Global Hotkeys</span>
+                  <span class="feature-detail">Win+Alt+S (Toggle) / Win+Alt+N (New)</span>
+                </td>
+                <td class="val-home"><span class="badge-on">✓ Included</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ Included</span></td>
+              </tr>
+              <tr>
+                <td class="feature-cell">
+                  <span class="feature-title">Local Offline Privacy</span>
+                  <span class="feature-detail">No cloud sync, zero telemetry, local JSON storage</span>
+                </td>
+                <td class="val-home"><span class="badge-on">✓ 100% Offline</span></td>
+                <td class="val-dev"><span class="badge-pro">✓ 100% Offline</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: About -->
+      <section id="tab-about" class="tab-pane">
+        <div class="about-card">
+          <svg class="about-app-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="64" height="64">
+            <defs>
+              <linearGradient id="abPaper" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff991"/>
+                <stop offset="100%" stop-color="#f5d12a"/>
+              </linearGradient>
+              <linearGradient id="abFlap" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#cfa612"/>
+                <stop offset="100%" stop-color="#edd040"/>
+              </linearGradient>
+              <filter id="abShadow" x="-15%" y="-15%" width="130%" height="130%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#2e2400" flood-opacity="0.18"/>
+              </filter>
+            </defs>
+            <path d="M 28 18 L 104 18 C 110 18, 112 20, 112 26 L 112 102 C 112 108, 110 110, 104 110 L 50 110 C 42 104, 36 94, 38 84 C 28 86, 20 80, 20 74 L 20 26 C 20 20, 22 18, 28 18 Z" fill="url(#abPaper)" stroke="#d4a508" stroke-width="1.8" stroke-linejoin="round" filter="url(#abShadow)"/>
+            <path d="M 20 26 C 20 20, 22 18, 28 18 L 104 18 C 110 18, 112 20, 112 26 L 112 32 L 20 32 Z" fill="rgba(0,0,0,0.035)"/>
+            <line x1="20" y1="32" x2="112" y2="32" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+            <g stroke="#221d06" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <polyline points="46,49 65,64 46,79"/>
+              <line x1="75" y1="79" x2="92" y2="79"/>
+            </g>
+            <path d="M 20 74 C 20 94, 32 110, 50 110 C 42 104, 36 94, 38 84 C 28 86, 22 80, 20 74 Z" fill="url(#abFlap)" stroke="#b58900" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+          <h3>StickyShell Home</h3>
+          <p class="about-ver">Version 1.0.0 (Home Edition)</p>
+          <p>A fast, lightweight sticky note designed for everyday note-taking, seamless terminal execution, and command scratchpad workflows.</p>
+          <div class="about-meta">
+            <div class="meta-row"><span>Operating System:</span> <strong id="about-os">Detecting...</strong></div>
+            <div class="meta-row"><span>Developer:</span> <strong>RadnusD</strong></div>
+            <div class="meta-row"><span>GitHub:</span> <a href="https://github.com/RadnusD" target="_blank" rel="noopener noreferrer">https://github.com/RadnusD</a></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../bridge.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

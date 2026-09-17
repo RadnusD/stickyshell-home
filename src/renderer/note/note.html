@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickyShell Home</title>
+  <link rel="stylesheet" href="../lib/katex/katex.min.css">
+  <link rel="stylesheet" href="note.css">
+  <script defer src="../lib/katex/katex.min.js"></script>
+  <script defer src="../lib/katex/contrib/auto-render.min.js"></script>
+</head>
+<body class="theme-classic-yellow">
+  <div class="sticky-container" id="app-container">
+    <!-- Header -->
+    <header class="sticky-header" id="sticky-header">
+      <div class="header-left">
+        <svg class="header-app-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="22" height="22">
+          <defs>
+            <linearGradient id="hdrPaper" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fff991"/>
+              <stop offset="100%" stop-color="#f5d12a"/>
+            </linearGradient>
+            <linearGradient id="hdrFlap" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#cfa612"/>
+              <stop offset="100%" stop-color="#edd040"/>
+            </linearGradient>
+          </defs>
+          <path d="M 28 18 L 104 18 C 110 18, 112 20, 112 26 L 112 102 C 112 108, 110 110, 104 110 L 50 110 C 42 104, 36 94, 38 84 C 28 86, 20 80, 20 74 L 20 26 C 20 20, 22 18, 28 18 Z" fill="url(#hdrPaper)" stroke="#d4a508" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M 20 26 C 20 20, 22 18, 28 18 L 104 18 C 110 18, 112 20, 112 26 L 112 32 L 20 32 Z" fill="rgba(0,0,0,0.035)"/>
+          <g stroke="#221d06" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <polyline points="46,49 65,64 46,79"/>
+            <line x1="75" y1="79" x2="92" y2="79"/>
+          </g>
+          <path d="M 20 74 C 20 94, 32 110, 50 110 C 42 104, 36 94, 38 84 C 28 86, 22 80, 20 74 Z" fill="url(#hdrFlap)" stroke="#b58900" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span class="app-title">StickyShell</span>
+        <span id="header-edition-badge" class="edition-badge badge-home" title="StickyShell Home Edition">HOME</span>
+      </div>
+
+      <div class="header-right">
+        <!-- 1. Plus button [new note] -->
+        <button id="btn-new-note" class="header-btn" title="New Note (+)">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- 2. Pin Button [Always on Top] -->
+        <button id="btn-pin" class="header-btn pin-btn" title="Pin to top (Always on top)">
+          <svg class="pin-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="17" x2="12" y2="22"></line>
+            <path d="M5 17h14v-2l-2-2V5a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v8l-2 2v2z"></path>
+            <circle cx="12" cy="3" r="1"></circle>
+          </svg>
+        </button>
+
+        <!-- 3. Delete button -->
+        <button id="btn-delete" class="header-btn" title="Delete Note">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+
+        <!-- 4. Three vertical dot menu button -->
+        <button id="btn-menu" class="header-btn" title="Menu">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+            <circle cx="12" cy="5" r="2"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+            <circle cx="12" cy="19" r="2"></circle>
+          </svg>
+        </button>
+
+        <!-- 5. Close button -->
+        <button id="btn-close" class="header-btn close-btn" title="Close (Hide to Tray)">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Context Menu Dropdown (Three-dot Menu) -->
+    <div id="dropdown-menu" class="dropdown-menu hidden">
+      <!-- 1st Option: Run -->
+      <div class="menu-item menu-run-item" id="menu-run">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+            <polygon points="6 4, 20 12, 6 20"></polygon>
+          </svg>
+        </span>
+        <span>Run (Ctrl+Enter)</span>
+      </div>
+      <div class="menu-item" id="menu-run-opts">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+        <span>Run Options...</span>
+      </div>
+      <div class="menu-divider"></div>
+
+      <div class="menu-item" id="menu-new-note">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </span>
+        <span>New Note</span>
+      </div>
+      <div class="menu-item" id="menu-pin">
+        <span class="menu-icon" id="menu-pin-icon">
+          <svg class="menu-pin-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="17" x2="12" y2="22"></line>
+            <path d="M5 17h14v-2l-2-2V5a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v8l-2 2v2z"></path>
+            <circle cx="12" cy="3" r="1"></circle>
+          </svg>
+        </span>
+        <span id="menu-pin-text">Pin to Top</span>
+      </div>
+      <div class="menu-item" id="menu-undo-delete">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+        </span>
+        <span>Undo Delete</span>
+      </div>
+      <div class="menu-item" id="menu-toggle-preview">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+        <span id="menu-preview-text">Preview (LaTeX / Math)</span>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" id="menu-settings">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </span>
+        <span>Settings</span>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item menu-delete-item" id="menu-delete">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </span>
+        <span>Delete Note</span>
+      </div>
+      <div class="menu-item" id="menu-close-window">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </span>
+        <span>Close Note</span>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item menu-exit" id="menu-exit">
+        <span class="menu-icon">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+            <line x1="12" y1="2" x2="12" y2="12"></line>
+          </svg>
+        </span>
+        <span>Exit App</span>
+      </div>
+    </div>
+
+    <!-- Quick Run Options Dropdown Flyout -->
+    <div id="run-options-flyout" class="run-flyout hidden">
+      <div class="flyout-header">
+        <button id="btn-flyout-back" class="btn-flyout-back" title="Back to menu">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Back</span>
+        </button>
+        <span class="flyout-header-title">Run Options</span>
+      </div>
+      <div class="flyout-divider"></div>
+      <div class="flyout-section-title">Execution Mode</div>
+      <div class="flyout-radio-group">
+        <label class="flyout-radio-option">
+          <input type="radio" name="run-mode" value="external" checked id="radio-mode-external">
+          <span class="radio-custom"></span>
+          <span class="radio-label">External Window</span>
+        </label>
+        <label class="flyout-radio-option">
+          <input type="radio" name="run-mode" value="capture" id="radio-mode-capture">
+          <span class="radio-custom"></span>
+          <span class="radio-label">Capture Output</span>
+        </label>
+      </div>
+
+      <div class="flyout-divider"></div>
+      <div class="flyout-section-title">Terminal Shell</div>
+      <div id="flyout-terminal-list" class="flyout-terminal-list">
+        <!-- Dynamically rendered terminal radios -->
+      </div>
+
+      <div class="flyout-divider"></div>
+      <div class="flyout-section-title">Working Folder</div>
+      <div class="flyout-folder-row">
+        <button id="btn-select-folder" class="flyout-btn-folder" title="Select working folder">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span id="folder-path-display" class="folder-path-display">Default (App Dir)</span>
+        </button>
+        <button id="btn-clear-folder" class="flyout-btn-clear-folder hidden" title="Reset to default">&times;</button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="sticky-body" id="sticky-body">
+      <!-- Note Textarea -->
+      <div class="note-editor-area" id="note-editor-area">
+        <textarea
+          id="note-textarea"
+          class="note-textarea"
+          placeholder="Type notes or commands here...&#10;Supports LaTeX & KaTeX (Ctrl+P to preview)&#10;Press Ctrl+Enter to execute"
+          spellcheck="false"
+        ></textarea>
+        <div id="note-preview" class="note-preview hidden" title="Double-click or press Ctrl+P to edit"></div>
+      </div>
+
+      <!-- Captured Output Pane (Collapsible) -->
+      <div class="output-wrapper hidden" id="output-wrapper">
+        <div class="output-divider-bar" id="output-header-bar">
+          <span class="output-heading-title">Output</span>
+          <div class="output-divider-line"></div>
+          <div class="output-actions">
+            <button id="btn-copy-output" class="btn-output-icon" title="Copy output">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+            <button id="btn-close-output" class="btn-output-icon btn-close-output" title="Close Output">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="output-scroll-pane" id="output-scroll-pane">
+          <pre id="note-output-pre"></pre>
+        </div>
+      </div>
+    </main>
+
+    <!-- Floating Minimal Toast Notification -->
+    <div id="status-toast" class="status-toast hidden">Ready</div>
+  </div>
+
+  <script src="../bridge.js"></script>
+  <script src="note.js"></script>
+</body>
+</html>
