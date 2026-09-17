@@ -175,7 +175,7 @@ impl TerminalRunner {
                     Command::new(&term)
                         .args([
                             "--working-directory",
-                            dir,
+                            target_dir,
                             "-e",
                             "bash",
                             "-c",
