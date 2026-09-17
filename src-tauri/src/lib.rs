@@ -11,7 +11,22 @@ use tauri::Manager;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use window_manager::WindowManager;
 
+const SINGLE_INSTANCE_PORT: u16 = 47921;
+
 pub fn run() {
+    let listener = match std::net::TcpListener::bind(("127.0.0.1", SINGLE_INSTANCE_PORT)) {
+        Ok(l) => l,
+        Err(_) => {
+            // Another instance is already running; ping it to restore/focus windows, then exit.
+            use std::io::Write;
+            if let Ok(mut stream) = std::net::TcpStream::connect(("127.0.0.1", SINGLE_INSTANCE_PORT)) {
+                let _ = stream.write_all(b"wake\n");
+                let _ = stream.flush();
+            }
+            std::process::exit(0);
+        }
+    };
+
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
@@ -71,7 +86,7 @@ pub fn run() {
         );
 
     let app = builder
-        .setup(|app| {
+        .setup(move |app| {
             let app_dir = app
                 .path()
                 .app_data_dir()
@@ -79,6 +94,74 @@ pub fn run() {
 
             let store = Arc::new(StoreManager::new(app_dir));
             app.manage(store.clone());
+
+            let app_handle_for_single_instance = app.handle().clone();
+            std::thread::spawn(move || {
+                use std::io::{BufRead, BufReader};
+                for stream in listener.incoming() {
+                    if let Ok(stream) = stream {
+                        let mut reader = BufReader::new(stream);
+                        let mut line = String::new();
+                        let _ = reader.read_line(&mut line);
+
+                        let app_handle = app_handle_for_single_instance.clone();
+                        let store = match app_handle.try_state::<Arc<StoreManager>>() {
+                            Some(s) => s.inner().clone(),
+                            None => continue,
+                        };
+
+                        let all_notes = store.get_all_notes();
+                        if all_notes.is_empty() {
+                            let settings = store.get_settings();
+                            let new_id = uuid::Uuid::new_v4().to_string();
+                            let note = store::Note {
+                                id: new_id.clone(),
+                                title: Some("".to_string()),
+                                content: "".to_string(),
+                                terminal: Some(settings.default_terminal),
+                                custom_folder: settings.default_folder,
+                                run_mode: Some(settings.default_run_mode),
+                                x: None,
+                                y: None,
+                                width: Some(270.0),
+                                height: Some(220.0),
+                                is_pinned: Some(false),
+                                theme: Some("classic-yellow".to_string()),
+                                opacity: Some(100.0),
+                                created_at: None,
+                                updated_at: None,
+                            };
+                            store.save_note(note);
+                            let _ = WindowManager::spawn_note_window(
+                                &app_handle,
+                                &new_id,
+                                None,
+                                None,
+                                Some(270.0),
+                                Some(220.0),
+                            );
+                        } else {
+                            for note in all_notes {
+                                let label = format!("note-{}", note.id);
+                                if let Some(win) = app_handle.get_webview_window(&label) {
+                                    let _ = win.unminimize();
+                                    let _ = win.show();
+                                    let _ = win.set_focus();
+                                } else {
+                                    let _ = WindowManager::spawn_note_window(
+                                        &app_handle,
+                                        &note.id,
+                                        note.x,
+                                        note.y,
+                                        note.width,
+                                        note.height,
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            });
 
             let _ = app.global_shortcut().register("super+alt+s");
             let _ = app.global_shortcut().register("super+alt+n");
