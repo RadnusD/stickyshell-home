@@ -10,39 +10,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create-release.outputs.result }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Create draft release on Public Repo
-        id: create-release
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
-          script: |
-            // Read version from tag or default to v1.0.0 for branch pushes/dispatch
-            const tag = context.ref.startsWith("refs/tags/") 
-              ? context.ref.replace("refs/tags/", "") 
-              : "v1.0.0";
-              
-            const { data } = await github.rest.repos.createRelease({
-              owner: 'RadnusD',
-              repo: 'stickyshell-home',
-              tag_name: tag,
-              name: `StickyShell Home ${tag}`,
-              body: 'StickyShell Home official release for Windows, Linux, and macOS.',
-              draft: true,
-              prerelease: false
-            });
-            return data.id;
-
   build-tauri:
-    needs: create-release
     permissions:
-      contents: write
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -68,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Rust stable
@@ -85,15 +55,8 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Build and Package with Tauri Action
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
-        with:
-          owner: 'RadnusD'
-          repo: 'stickyshell-home'
-          releaseId: ${{ needs.create-release.outputs.release_id }}
-          args: ${{ matrix.args }}
+      - name: Build Tauri Bundles
+        run: npx @tauri-apps/cli build ${{ matrix.args }}
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -103,3 +66,38 @@ jobs:
             ${{ matrix.bundle_path }}
             src-tauri/target/release/bundle/
           if-no-files-found: warn
+
+  publish-release:
+    needs: build-tauri
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Publish Release to Public Repository
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: RadnusD/stickyshell-home
+          token: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.0.0' }}
+          body: 'StickyShell Home official release for Windows, Linux, and macOS.'
+          draft: true
+          prerelease: false
+          files: |
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.msi
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.AppImage
+            release-artifacts/**/*.deb
+            release-artifacts/**/*.rpm
+            release-artifacts/**/*.tar.gz
+            release-artifacts/**/*.zip
+            release-artifacts/**/*.sig
