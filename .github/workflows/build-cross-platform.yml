@@ -98,6 +98,5 @@ jobs:
             release-artifacts/**/*.AppImage
             release-artifacts/**/*.deb
             release-artifacts/**/*.rpm
-            release-artifacts/**/*.tar.gz
-            release-artifacts/**/*.zip
-            release-artifacts/**/*.sig
+            release-artifacts/**/*universal.app.tar.gz
+
