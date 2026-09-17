@@ -14,123 +14,106 @@
 
 ---
 
-## 🌟 Overview
+## 📥 Downloads (Version 1.0.0)
 
-**StickyShell Home** blends the familiar simplicity of desktop sticky notes with the power of an interactive terminal scratchpad. Write quick thoughts, draft command-line snippets, and execute them directly from the note without constantly switching windows or losing focus.
+Download the official release for your operating system:
 
-Designed with **Rust** and **Tauri v2**, StickyShell uses minimal system resources (< 35 MB RAM), launches in milliseconds, and operates **100% offline** with zero telemetry or cloud dependencies.
+| Platform | Package | Architecture | Download Link |
+| :--- | :--- | :--- | :--- |
+| **Windows** | **Setup Installer (`.exe`)** | 64-bit (x64) | [**Download Setup (.exe)**](../../releases/latest) |
+| **Windows** | **Enterprise Package (`.msi`)** | 64-bit (x64) | [**Download MSI (.msi)**](../../releases/latest) |
+| **Windows** | **Portable Binary (`.exe`)** | 64-bit (x64) | [**Download Portable (.exe)**](../../releases/latest) |
+| **macOS** | **Disk Image (`.dmg`)** | Universal (Apple Silicon & Intel) | [**Download DMG (.dmg)**](../../releases/latest) |
+| **Linux** | **Debian Package (`.deb`)** | 64-bit (amd64) | [**Download DEB (.deb)**](../../releases/latest) |
+| **Linux** | **Standalone AppImage** | 64-bit (x86_64) | [**Download AppImage**](../../releases/latest) |
 
----
-
-## ✨ Key Features
-
-- 💻 **Inline & External Execution**: Run shell commands directly from your note.
-  - **Inline Capture Mode (`▶`)**: Captures standard output and error in an integrated drawer with one-click copy.
-  - **External Console Mode (`👁`)**: Spawns an external interactive terminal window (CMD or PowerShell) keeping the console open for continuous interaction.
-- 📌 **Always on Top (Pinning)**: Pin any note above all other OS windows with a single click.
-- 🛡️ **Delete Safety & Undo Buffer**:
-  - Optional **"Confirm Before Deleting Notes"** prompt prevents accidental losses.
-  - Persistent **Undo Delete buffer**: Restore closed or deleted notes even after computer reboots.
-- ⚡ **Global Keyboard Shortcuts**:
-  - `Win + Alt + S`: Instantly toggle (show/hide) all open notes.
-  - `Win + Alt + N`: Summon a fresh sticky note on your screen.
-- 📂 **Custom Working Directories**: Assign specific working folders per note, or default to your user home directory.
-- 🔒 **100% Local & Private**: All notes, undo history, and settings are saved locally on your device in standard JSON format (`stickyshell_data.json`). No accounts, no servers, zero telemetry.
+*All installation files are also available on the official [**GitHub Releases**](../../releases) page.*
 
 ---
 
-## 🚀 Downloads & Installers
+## 🌟 What is StickyShell?
 
-Pre-built binaries and installers for all major platforms:
+**StickyShell Home** combines the everyday convenience of sticky notes with the utility of an instant command-line scratchpad. 
 
-| Platform | Package Format | Description |
-| :--- | :--- | :--- |
-| **Windows** | [`.exe` Setup Installer](src-tauri/target/release/bundle/nsis/StickyShell%20Home_1.0.0_x64-setup.exe) | Standard NSIS Windows Setup Wizard with Desktop & Start Menu shortcuts |
-| **Windows** | [`.msi` Package](src-tauri/target/release/bundle/msi/StickyShell%20Home_1.0.0_x64_en-US.msi) | Enterprise-grade Windows Installer |
-| **Windows** | [Standalone `.exe`](src-tauri/target/release/stickyshell-home.exe) | Portable standalone executable (no installation required) |
-| **macOS** | `.dmg` Installer | Universal DMG (supports Apple Silicon M1/M2/M3/M4 & Intel x86_64) |
-| **Linux** | `.deb` Package | Debian / Ubuntu installer package |
-| **Linux** | `.AppImage` | Portable universal Linux binary (run with `chmod +x`) |
+Whether you are saving quick snippets, drafting code, or running diagnostics, StickyShell lets you execute commands right from your sticky note without ever breaking your workflow or managing multiple terminal windows.
 
 ---
 
-## 🛠️ Building from Source
+## ✨ Features
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [Rust & Cargo](https://rustup.rs/) (v1.75 or higher)
-- C++ build tools:
-  - **Windows**: Microsoft Visual Studio C++ Build Tools with WebView2
-  - **macOS**: Xcode Command Line Tools (`xcode-select --install`)
-  - **Linux (Ubuntu/Debian)**:
-    ```bash
-    sudo apt-get update
-    sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf build-essential
-    ```
-
-### Clone & Install
-
-```bash
-git clone https://github.com/RadnusD/stickyshell-home.git
-cd stickyshell-home
-npm install
-```
-
-### Development Mode
-
-Run the app locally with hot-reloading:
-
-```bash
-npm run dev
-```
-
-### Production Release Build
-
-Compile the optimized, hardened release binaries and installers:
-
-```bash
-npm run build
-```
-
-The output packages will be located in:
-- Windows: `src-tauri/target/release/bundle/nsis/` and `msi/`
-- macOS: `src-tauri/target/release/bundle/dmg/`
-- Linux: `src-tauri/target/release/bundle/deb/` and `appimage/`
+- 💻 **Dual Execution Modes**:
+  - **Inline Capture (`▶`)**: Captures output and errors in a slide-out drawer with one-click copy.
+  - **External Console (`👁`)**: Opens an interactive system console (CMD or PowerShell) for interactive workflows.
+- 📌 **Always on Top (Pinning)**: Keep your active note floating above other windows with a single click.
+- 🛡️ **Accidental Delete Protection**:
+  - Optional **"Confirm Before Deleting Notes"** safety prompt.
+  - Persistent **Undo Delete Buffer**: Restore closed or deleted notes with `Ctrl+Z`, even after restarting your computer.
+- ⚡ **Global Shortcuts**:
+  - `Win + Alt + S`: Show or hide all sticky notes instantly.
+  - `Win + Alt + N`: Spawn a new note at any time.
+- 📂 **Custom Working Folders**: Set per-note working directories, or fall back to your user home profile.
+- 🔒 **100% Offline & Private**: Zero cloud sync, zero tracking, zero accounts. All notes and settings are stored locally on your machine in standard JSON format.
 
 ---
 
-## ☁️ Cross-Platform Cloud Builds (GitHub Actions)
+## 🖥️ Installation Guide
 
-This repository includes an automated multi-platform CI/CD workflow at [`.github/workflows/build-cross-platform.yml`](.github/workflows/build-cross-platform.yml).
+### Windows
+1. Download `StickyShell Home_1.0.0_x64-setup.exe`.
+2. Run the installer and follow the setup wizard.
+3. Launch **StickyShell Home** from your Desktop or Start Menu.
 
-Whenever you push to `main` or trigger a build via the **Actions** tab on GitHub:
-1. Native runners (`macos-latest`, `ubuntu-22.04`, `windows-latest`) compile simultaneously in the cloud.
-2. Production packages (`.dmg`, `.deb`, `.AppImage`, `.exe`, `.msi`) are automatically uploaded as downloadable release artifacts.
+### macOS
+1. Download `StickyShell Home_1.0.0_universal.dmg`.
+2. Open the disk image and drag **StickyShell Home** into your **Applications** folder.
+3. Open the app from Applications or Spotlight.
+
+### Linux
+- **Debian / Ubuntu**:
+  ```bash
+  sudo dpkg -i stickyshell-home_1.0.0_amd64.deb
+  ```
+- **AppImage**:
+  ```bash
+  chmod +x stickyshell-home_1.0.0_amd64.AppImage
+  ./stickyshell-home_1.0.0_amd64.AppImage
+  ```
 
 ---
 
-## 🔐 Security & Binary Hardening
+## ⌨️ Keyboard Shortcuts Reference
 
-StickyShell Home is engineered with multiple layers of client-side protection:
-
-- **Link-Time Optimization (LTO)**: Whole-program optimization merging crate boundaries.
-- **Symbol Stripping**: Release profiles remove all debug tables, variable names, and line numbers (`strip = true`).
-- **Panic Abort**: Prevents stack unwinding and scrubs developer system file paths from binary logs (`panic = "abort"`).
-- **Anti-Inspection Guards**: Blocks webview DevTools shortcuts (`F12`, `Ctrl+Shift+I`) and context-menu inspection in production.
+| Shortcut | Action |
+| :--- | :--- |
+| `Win + Alt + S` | Toggle (Show/Hide) all sticky notes |
+| `Win + Alt + N` | Create a new sticky note |
+| `Ctrl + Enter` | Run command (Inline Capture mode) |
+| `Ctrl + Shift + Enter` | Run command (External Console mode) |
+| `Ctrl + Z` | Undo note deletion (from 3-dot menu or shortcut) |
 
 ---
 
-## 📁 Data Storage Location
+## 🔒 Privacy & Local Storage
 
-All configuration and note history is stored in a clean local JSON file:
+StickyShell respects your complete privacy:
+- **No telemetry or analytics.**
+- **No cloud connections.**
+- All notes and configuration are stored locally on your hard drive:
+  - **Windows**: `%APPDATA%\com.stickyshell.home\stickyshell_data.json`
+  - **macOS**: `~/Library/Application Support/com.stickyshell.home/stickyshell_data.json`
+  - **Linux**: `~/.config/com.stickyshell.home/stickyshell_data.json`
 
-- **Windows**: `%APPDATA%\com.stickyshell.home\stickyshell_data.json`
-- **macOS**: `~/Library/Application Support/com.stickyshell.home/stickyshell_data.json`
-- **Linux**: `~/.config/com.stickyshell.home/stickyshell_data.json`
+---
+
+## 💬 Feedback & Support
+
+Encountered a bug or have a suggestion?
+- Open an issue on our [**Issues Tracker**](../../issues).
 
 ---
 
 ## 📄 License & Copyright
 
-Copyright © 2026 StickyShell. Developed by **RadnusD**. All rights reserved.
+**Copyright © 2026 StickyShell. All rights reserved.**
+
+This software is proprietary and confidential. Unauthorized copying, distribution, modification, reverse engineering, decompilation, or disassembly of this software or its binaries is strictly prohibited.
