@@ -82,21 +82,40 @@ jobs:
           path: release-artifacts
 
       - name: Publish Release to Public Repository
-        uses: softprops/action-gh-release@v2
-        with:
-          repository: RadnusD/stickyshell-home
-          token: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}
-          name: ${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.0.0' }}
-          body: 'StickyShell Home official release for Windows, Linux, and macOS.'
-          draft: true
-          prerelease: false
-          files: |
+        env:
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
+        run: |
+          TAG="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}"
+          TITLE="${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.0.0' }}"
+          REPO="RadnusD/stickyshell-home"
+
+          # Enable recursive globbing and ignore unmatched patterns
+          shopt -s globstar nullglob
+          FILES=(
             release-artifacts/**/*.exe
             release-artifacts/**/*.msi
             release-artifacts/**/*.dmg
             release-artifacts/**/*.AppImage
             release-artifacts/**/*.deb
             release-artifacts/**/*.rpm
-            release-artifacts/**/*universal.app.tar.gz
+          )
+
+          echo "Found ${#FILES[@]} release binaries to upload:"
+          for f in "${FILES[@]}"; do
+            echo " - $f"
+          done
+
+          # Check if release already exists; update if so, else create
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release $TAG already exists, uploading assets with clobber..."
+            gh release upload "$TAG" "${FILES[@]}" --repo "$REPO" --clobber
+          else
+            echo "Creating new draft release $TAG..."
+            gh release create "$TAG" "${FILES[@]}" \
+              --repo "$REPO" \
+              --title "$TITLE" \
+              --notes "StickyShell Home official release for Windows, Linux, and macOS." \
+              --draft \
+              --clobber
+          fi
 

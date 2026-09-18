@@ -418,6 +418,9 @@ pub fn run() {
         pick_terminal_exe,
         resize_note_window,
         get_default_working_directory,
+        open_external_url,
+        get_system_diagnostics,
+        send_telegram_error_report,
         exit_app
     ]);
 
@@ -446,6 +449,9 @@ pub fn run() {
         pick_terminal_exe,
         resize_note_window,
         get_default_working_directory,
+        open_external_url,
+        get_system_diagnostics,
+        send_telegram_error_report,
         exit_app
     ]);
 
