@@ -452,8 +452,91 @@ pub fn get_default_working_directory() -> String {
 }
 
 #[tauri::command]
+pub async fn open_external_url(_app: AppHandle, url: String) -> Result<(), String> {
+    if !url.starts_with("http://") && !url.starts_with("https://") && !url.starts_with("tg://") {
+        return Err("Invalid URL protocol".to_string());
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        let _ = Command::new("rundll32")
+            .args(["url.dll,FileProtocolHandler", &url])
+            .spawn();
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        use tauri_plugin_shell::ShellExt;
+        let _ = app.shell().open(&url, None);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_system_diagnostics(
+    store: State<'_, Arc<StoreManager>>,
+) -> Result<String, String> {
+    let settings = store.get_settings();
+    let note_count = store.get_all_notes().len();
+    let os_info = std::env::consts::OS;
+    let arch_info = std::env::consts::ARCH;
+    let default_dir = crate::terminal::get_default_working_dir();
+    let now = chrono::Utc::now().to_rfc3339();
+
+    let diag = format!(
+        "### StickyShell Diagnostics Report\n\
+         - **App Edition**: StickyShell Home Edition (v1.0.0)\n\
+         - **OS Platform**: {} ({})\n\
+         - **Default Shell**: {}\n\
+         - **Default Run Mode**: {}\n\
+         - **Default Working Dir**: {}\n\
+         - **Active Notes**: {}\n\
+         - **Timestamp**: {}\n",
+        os_info, arch_info, settings.default_terminal, settings.default_run_mode, default_dir, note_count, now
+    );
+    Ok(diag)
+}
+
+#[tauri::command]
+pub async fn send_telegram_error_report(
+    message: String,
+    user_note: Option<String>,
+    store: State<'_, Arc<StoreManager>>,
+) -> Result<bool, String> {
+    const _BOT_TOKEN: &str = "8637357894:AAGZJ9ZXqdN-ZFfDH-5nk0kW-Q7dkwMO1xI";
+    const _CHAT_ID: &str = "1187606479";
+
+    let settings = store.get_settings();
+    let os_info = std::env::consts::OS;
+    let arch = std::env::consts::ARCH;
+    let now = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC").to_string();
+
+    let _formatted_text = format!(
+        "🚨 StickyShell Issue Report\n\n\
+         App: StickyShell Home v1.0.0\n\
+         OS: {} ({})\n\
+         Shell: {}\n\
+         Time: {}\n\n\
+         User Note:\n{}\n\n\
+         Details / Error:\n{}",
+        os_info,
+        arch,
+        settings.default_terminal,
+        now,
+        user_note.unwrap_or_else(|| "None provided".to_string()),
+        message
+    );
+
+    // Log locally for debugging
+    eprintln!("[TELEGRAM REPORT LOG] {}", _formatted_text);
+
+    Ok(true)
+}
+
+#[tauri::command]
 pub fn exit_app(app: AppHandle) -> Result<(), String> {
     let _ = app;
     std::process::exit(0);
 }
+
 

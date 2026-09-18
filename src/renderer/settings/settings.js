@@ -149,7 +149,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // OS Info
+  // Toast Notification Helper
+  const toastEl = document.getElementById('settings-toast');
+  let toastTimer = null;
+  function showToast(msg, duration = 3000) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.remove('hidden');
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove('show');
+      setTimeout(() => toastEl.classList.add('hidden'), 200);
+    }, duration);
+  }
+
+  // OS Info & External Links
   if (aboutOs) {
     try {
       const plat = window.stickyShellAPI.getPlatform();
@@ -157,6 +172,195 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
       aboutOs.textContent = 'Windows';
     }
+  }
+
+  const linkGithubRepo = document.getElementById('link-github-repo');
+  if (linkGithubRepo) {
+    linkGithubRepo.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.stickyShellAPI && window.stickyShellAPI.openExternalUrl) {
+        window.stickyShellAPI.openExternalUrl('https://github.com/RadnusD');
+      }
+    });
+  }
+
+  // Feedback & Error Reporting Elements
+  const txtErrorFeedback = document.getElementById('txt-error-feedback');
+  const btnSendTelegramReport = document.getElementById('btn-send-telegram-report');
+  const telegramReportStatus = document.getElementById('telegram-report-status');
+  const btnReportGithubBug = document.getElementById('btn-report-github-bug');
+  const btnReportGithubFeature = document.getElementById('btn-report-github-feature');
+  const btnOpenTelegramChat = document.getElementById('btn-open-telegram-chat');
+  const btnCopyDiagnostics = document.getElementById('btn-copy-diagnostics');
+
+  // Telegram Bot Credentials
+  const TELEGRAM_BOT_TOKEN = '8637357894:AAGZJ9ZXqdN-ZFfDH-5nk0kW-Q7dkwMO1xI';
+  const TELEGRAM_CHAT_ID = '1187606479';
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // 1. Send Instant Telegram Error Report
+  if (btnSendTelegramReport) {
+    btnSendTelegramReport.addEventListener('click', async () => {
+      const userMessage = txtErrorFeedback ? txtErrorFeedback.value.trim() : '';
+      const originalText = btnSendTelegramReport.innerHTML;
+      btnSendTelegramReport.disabled = true;
+      btnSendTelegramReport.innerHTML = '<span class="btn-text">⏳ Sending...</span>';
+      if (telegramReportStatus) telegramReportStatus.textContent = '';
+
+      try {
+        let diag = '';
+        if (window.stickyShellAPI && window.stickyShellAPI.getSystemDiagnostics) {
+          diag = await window.stickyShellAPI.getSystemDiagnostics();
+        } else {
+          diag = `OS: ${navigator.userAgent}\nApp: StickyShell Home v1.0.0`;
+        }
+
+        // Notify local Rust logging backend
+        if (window.stickyShellAPI && window.stickyShellAPI.sendTelegramReport) {
+          window.stickyShellAPI.sendTelegramReport(diag, userMessage).catch(() => {});
+        }
+
+        // Format HTML Telegram message
+        const now = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+        const htmlMessage =
+          `<b>🚨 StickyShell Issue Report</b>\n\n` +
+          `<b>📱 App:</b> StickyShell Home v1.0.0\n` +
+          `<b>⏰ Time:</b> ${escapeHtml(now)}\n\n` +
+          (userMessage ? `<b>📝 User Note:</b>\n${escapeHtml(userMessage)}\n\n` : '') +
+          `<b>🔍 System Diagnostics:</b>\n<pre>${escapeHtml(diag)}</pre>`;
+
+        // Direct dispatch to Telegram Bot API
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: htmlMessage,
+            parse_mode: 'HTML'
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.description || `HTTP ${response.status}`);
+        }
+
+        if (telegramReportStatus) {
+          telegramReportStatus.textContent = '✅ Sent to developer Telegram!';
+          telegramReportStatus.style.color = '#15803d';
+        }
+        showToast('✅ Report dispatched to developer Telegram!');
+        if (txtErrorFeedback) txtErrorFeedback.value = '';
+      } catch (err) {
+        console.error('Failed to send telegram report:', err);
+        if (telegramReportStatus) {
+          telegramReportStatus.textContent = '⚠️ Could not send: ' + (err.message || 'Network error');
+          telegramReportStatus.style.color = '#b45309';
+        }
+        showToast('⚠️ Could not send report. Please check internet connection.');
+      } finally {
+        btnSendTelegramReport.disabled = false;
+        btnSendTelegramReport.innerHTML = originalText;
+      }
+    });
+  }
+
+  // 2. Report Bug on GitHub (Pre-filled template)
+  if (btnReportGithubBug) {
+    btnReportGithubBug.addEventListener('click', async () => {
+      try {
+        let diag = '';
+        if (window.stickyShellAPI && window.stickyShellAPI.getSystemDiagnostics) {
+          diag = await window.stickyShellAPI.getSystemDiagnostics();
+        }
+        const title = encodeURIComponent('[Bug]: ');
+        const body = encodeURIComponent(
+          `## Problem Description\n<!-- Describe what happened -->\n\n` +
+          `## Steps to Reproduce\n1. \n2. \n3. \n\n` +
+          `## Expected Behavior\n<!-- What did you expect to happen? -->\n\n` +
+          `## Diagnostics\n${diag}`
+        );
+        const url = `https://github.com/RadnusD/stickyshell-home/issues/new?title=${title}&body=${body}`;
+        if (window.stickyShellAPI && window.stickyShellAPI.openExternalUrl) {
+          await window.stickyShellAPI.openExternalUrl(url);
+        }
+      } catch (err) {
+        console.error('Open GitHub bug error:', err);
+      }
+    });
+  }
+
+  // 3. Request Feature on GitHub
+  if (btnReportGithubFeature) {
+    btnReportGithubFeature.addEventListener('click', async () => {
+      try {
+        const title = encodeURIComponent('[Feature]: ');
+        const body = encodeURIComponent(
+          `## Feature Proposal\n<!-- What new capability or workflow would you like to see? -->\n\n` +
+          `## Why is this needed?\n<!-- Describe the use-case -->\n`
+        );
+        const url = `https://github.com/RadnusD/stickyshell-home/issues/new?title=${title}&body=${body}`;
+        if (window.stickyShellAPI && window.stickyShellAPI.openExternalUrl) {
+          await window.stickyShellAPI.openExternalUrl(url);
+        }
+      } catch (err) {
+        console.error('Open GitHub feature error:', err);
+      }
+    });
+  }
+
+  // 4. Telegram Bot Direct Link
+  if (btnOpenTelegramChat) {
+    btnOpenTelegramChat.addEventListener('click', async () => {
+      try {
+        const url = 'https://t.me/my_stickyshell_reports_bot';
+        if (window.stickyShellAPI && window.stickyShellAPI.openExternalUrl) {
+          await window.stickyShellAPI.openExternalUrl(url);
+        }
+      } catch (err) {
+        console.error('Open Telegram bot error:', err);
+      }
+    });
+  }
+
+  // 5. Copy System Diagnostics
+  if (btnCopyDiagnostics) {
+    btnCopyDiagnostics.addEventListener('click', async () => {
+      try {
+        let diag = '';
+        if (window.stickyShellAPI && window.stickyShellAPI.getSystemDiagnostics) {
+          diag = await window.stickyShellAPI.getSystemDiagnostics();
+        } else {
+          diag = `### StickyShell Diagnostics\n- OS: ${navigator.userAgent}\n- App: StickyShell Home v1.0.0`;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(diag);
+        } else {
+          // Fallback textarea copy
+          const temp = document.createElement('textarea');
+          temp.value = diag;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand('copy');
+          document.body.removeChild(temp);
+        }
+
+        showToast('📋 Diagnostics copied to clipboard!');
+      } catch (err) {
+        console.error('Copy diagnostics error:', err);
+        showToast('❌ Failed to copy diagnostics.');
+      }
+    });
   }
 
   // Real-time synchronization
