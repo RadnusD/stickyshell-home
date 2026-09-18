@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickyShell Home - The Executable Desktop Sticky Note</title>
+  <meta name="description" content="A lightweight, cross-platform desktop sticky note that doubles as an instant executable shell scratchpad.">
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --primary-hover: #d97706;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+    
+    /* Header & Nav */
+    header { padding: 32px 0 20px; border-bottom: 1px solid var(--surface-border); }
+    .nav { display: flex; align-items: center; justify-content: space-between; }
+    .logo-group { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
+    .nav-link:hover { color: var(--text); }
+    .btn-gh { display: inline-flex; align-items: center; gap: 8px; background: #273549; color: #fff; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--surface-border); }
+    .btn-gh:hover { background: #334155; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 80px 0 60px; }
+    .hero-badge { display: inline-block; background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 14px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: 3.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 20px; letter-spacing: -0.02em; }
+    .hero h1 span { background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 1.25rem; color: var(--text-muted); max-width: 680px; margin: 0 auto 36px; }
+    
+    /* Download Buttons */
+    .downloads-grid { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }
+    .btn-dl { display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: #000; padding: 14px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 1rem; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25); transition: transform 0.15s, background 0.15s; }
+    .btn-dl:hover { background: var(--primary-hover); transform: translateY(-2px); }
+    .btn-dl-sub { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); color: var(--text); padding: 14px 20px; border-radius: 10px; font-weight: 600; text-decoration: none; border: 1px solid var(--surface-border); transition: background 0.15s; }
+    .btn-dl-sub:hover { background: #273549; }
+
+    /* Features Grid */
+    .features-section { padding: 60px 0; }
+    .section-title { text-align: center; margin-bottom: 40px; }
+    .section-title h2 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    .section-title p { color: var(--text-muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .card { background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius); padding: 28px; }
+    .card-icon { font-size: 2rem; margin-bottom: 16px; }
+    .card h3 { font-size: 1.2rem; margin-bottom: 10px; font-weight: 700; }
+    .card p { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* Terminal & Shortcuts */
+    .terminal-box { background: #0b0f19; border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 0.9rem; color: #38bdf8; margin: 16px 0; overflow-x: auto; }
+    .table-container { overflow-x: auto; margin-top: 24px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid var(--surface-border); font-size: 0.95rem; }
+    th { color: var(--text-muted); font-weight: 600; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--surface-border); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 60px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <nav class="nav">
+        <a href="#" class="logo-group">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32">
+            <defs>
+              <linearGradient id="pGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff991"/>
+                <stop offset="100%" stop-color="#f5d12a"/>
+              </linearGradient>
+            </defs>
+            <path d="M 28 18 L 104 18 C 110 18, 112 20, 112 26 L 112 102 C 112 108, 110 110, 104 110 L 50 110 C 42 104, 36 94, 38 84 C 28 86, 20 80, 20 74 L 20 26 C 20 20, 22 18, 28 18 Z" fill="url(#pGrad)" stroke="#d4a508" stroke-width="3"/>
+            <g stroke="#221d06" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <polyline points="46,49 65,64 46,79"/>
+              <line x1="75" y1="79" x2="92" y2="79"/>
+            </g>
+          </svg>
+          StickyShell Home
+        </a>
+        <div class="nav-links">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#shortcuts" class="nav-link">Shortcuts</a>
+          <a href="https://github.com/RadnusD/stickyshell-source/releases/tag/v1.0.0" class="btn-gh" target="_blank">
+            Release v1.0.0
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badge">⚡ Version 1.0.0 Released</div>
+      <h1>Desktop Sticky Notes Meet <span>Instant Shell Execution</span></h1>
+      <p>A fast, lightweight desktop note-taking app that doubles as an instant command-line scratchpad. Built with Tauri v2 & Rust for speed and 100% offline privacy.</p>
+
+      <div class="downloads-grid">
+        <a href="https://github.com/RadnusD/stickyshell-source/releases/download/v1.0.0/StickyShell.Home_1.0.0_x64-setup.exe" class="btn-dl">
+          <span>🪟</span> Download for Windows (.exe)
+        </a>
+        <a href="https://github.com/RadnusD/stickyshell-source/releases/download/v1.0.0/StickyShell.Home_1.0.0_universal.dmg" class="btn-dl-sub">
+          <span>🍏</span> macOS (.dmg)
+        </a>
+        <a href="https://github.com/RadnusD/stickyshell-source/releases/download/v1.0.0/StickyShell.Home_1.0.0_amd64.AppImage" class="btn-dl-sub">
+          <span>🐧</span> Linux (.AppImage)
+        </a>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Also available: <a href="https://github.com/RadnusD/stickyshell-source/releases/download/v1.0.0/StickyShell.Home_1.0.0_x64_en-US.msi" style="color: var(--accent);">Windows MSI</a> • <a href="https://github.com/RadnusD/stickyshell-source/releases/download/v1.0.0/StickyShell.Home_1.0.0_amd64.deb" style="color: var(--accent);">Linux DEB</a> • <a href="https://github.com/RadnusD/stickyshell-source/releases/download/v1.0.0/StickyShell.Home-1.0.0-1.x86_64.rpm" style="color: var(--accent);">Linux RPM</a></p>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features-section">
+      <div class="section-title">
+        <h2>Engineered for Focus & Productivity</h2>
+        <p>Everything you need in a quick note without opening a heavy IDE.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Dual Execution Modes</h3>
+          <p>Run commands in <strong>Inline Capture (Ctrl+Enter)</strong> mode with a slide-out drawer, or pop open an interactive <strong>External Console (Ctrl+Shift+Enter)</strong>.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🛡️</div>
+          <h3>Persistent Undo Buffer</h3>
+          <p>Accidentally closed a note? Press <strong>Ctrl+Z</strong> to instantly restore your deleted notes and commands, even after closing the app.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>100% Offline & Private</h3>
+          <p>Zero telemetry, zero cloud tracking, zero accounts. All notes and settings remain strictly on your local hard drive in standard JSON.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📌</div>
+          <h3>Always on Top & Global Hotkeys</h3>
+          <p>Pin notes to float above your active workspace. Toggle all notes instantly with <code>Win + Alt + S</code> or spawn a new note with <code>Win + Alt + N</code>.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📐</div>
+          <h3>Markdown & KaTeX Math</h3>
+          <p>Write formatted notes, task checklists, and complex mathematical formulas with built-in instant LaTeX rendering.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <h3>Sub-Millisecond Speed</h3>
+          <p>Powered by Tauri v2 and Rust. Uses negligible memory, launches instantly, and consumes practically zero background CPU.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shortcuts -->
+    <section id="shortcuts" class="features-section">
+      <div class="section-title">
+        <h2>Keyboard Shortcuts</h2>
+        <p>Control StickyShell without ever leaving your keyboard.</p>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Shortcut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Win + Alt + S</code></td>
+              <td>Toggle (Show / Hide) all open sticky notes</td>
+            </tr>
+            <tr>
+              <td><code>Win + Alt + N</code></td>
+              <td>Create a new sticky note</td>
+            </tr>
+            <tr>
+              <td><code>Ctrl + Enter</code></td>
+              <td>Execute command (Inline Capture Mode)</td>
+            </tr>
+            <tr>
+              <td><code>Ctrl + Shift + Enter</code></td>
+              <td>Execute command (External System Console)</td>
+            </tr>
+            <tr>
+              <td><code>Ctrl + Z</code></td>
+              <td>Undo delete (Restores closed note)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      <p>StickyShell Home • Copyright &copy; 2026 StickyShell / RadnusD. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>
