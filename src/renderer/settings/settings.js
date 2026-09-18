@@ -184,97 +184,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Feedback & Error Reporting Elements
-  const txtErrorFeedback = document.getElementById('txt-error-feedback');
-  const btnSendTelegramReport = document.getElementById('btn-send-telegram-report');
-  const telegramReportStatus = document.getElementById('telegram-report-status');
+  // Feedback & Support Elements
   const btnReportGithubBug = document.getElementById('btn-report-github-bug');
   const btnReportGithubFeature = document.getElementById('btn-report-github-feature');
-  const btnOpenTelegramChat = document.getElementById('btn-open-telegram-chat');
   const btnCopyDiagnostics = document.getElementById('btn-copy-diagnostics');
 
-  // Telegram Bot Credentials
-  const TELEGRAM_BOT_TOKEN = '8637357894:AAGZJ9ZXqdN-ZFfDH-5nk0kW-Q7dkwMO1xI';
-  const TELEGRAM_CHAT_ID = '1187606479';
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  // 1. Send Instant Telegram Error Report
-  if (btnSendTelegramReport) {
-    btnSendTelegramReport.addEventListener('click', async () => {
-      const userMessage = txtErrorFeedback ? txtErrorFeedback.value.trim() : '';
-      const originalText = btnSendTelegramReport.innerHTML;
-      btnSendTelegramReport.disabled = true;
-      btnSendTelegramReport.innerHTML = '<span class="btn-text">⏳ Sending...</span>';
-      if (telegramReportStatus) telegramReportStatus.textContent = '';
-
-      try {
-        let diag = '';
-        if (window.stickyShellAPI && window.stickyShellAPI.getSystemDiagnostics) {
-          diag = await window.stickyShellAPI.getSystemDiagnostics();
-        } else {
-          diag = `OS: ${navigator.userAgent}\nApp: StickyShell Home v1.0.0`;
-        }
-
-        // Notify local Rust logging backend
-        if (window.stickyShellAPI && window.stickyShellAPI.sendTelegramReport) {
-          window.stickyShellAPI.sendTelegramReport(diag, userMessage).catch(() => {});
-        }
-
-        // Format HTML Telegram message
-        const now = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-        const htmlMessage =
-          `<b>🚨 StickyShell Issue Report</b>\n\n` +
-          `<b>📱 App:</b> StickyShell Home v1.0.0\n` +
-          `<b>⏰ Time:</b> ${escapeHtml(now)}\n\n` +
-          (userMessage ? `<b>📝 User Note:</b>\n${escapeHtml(userMessage)}\n\n` : '') +
-          `<b>🔍 System Diagnostics:</b>\n<pre>${escapeHtml(diag)}</pre>`;
-
-        // Direct dispatch to Telegram Bot API
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: htmlMessage,
-            parse_mode: 'HTML'
-          })
-        });
-
-        const data = await response.json();
-        if (!response.ok || !data.ok) {
-          throw new Error(data.description || `HTTP ${response.status}`);
-        }
-
-        if (telegramReportStatus) {
-          telegramReportStatus.textContent = '✅ Sent to developer Telegram!';
-          telegramReportStatus.style.color = '#15803d';
-        }
-        showToast('✅ Report dispatched to developer Telegram!');
-        if (txtErrorFeedback) txtErrorFeedback.value = '';
-      } catch (err) {
-        console.error('Failed to send telegram report:', err);
-        if (telegramReportStatus) {
-          telegramReportStatus.textContent = '⚠️ Could not send: ' + (err.message || 'Network error');
-          telegramReportStatus.style.color = '#b45309';
-        }
-        showToast('⚠️ Could not send report. Please check internet connection.');
-      } finally {
-        btnSendTelegramReport.disabled = false;
-        btnSendTelegramReport.innerHTML = originalText;
-      }
-    });
-  }
-
-  // 2. Report Bug on GitHub (Pre-filled template)
+  // 1. Report Bug on GitHub (Pre-filled template)
   if (btnReportGithubBug) {
     btnReportGithubBug.addEventListener('click', async () => {
       try {
@@ -299,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 3. Request Feature on GitHub
+  // 2. Request Feature on GitHub
   if (btnReportGithubFeature) {
     btnReportGithubFeature.addEventListener('click', async () => {
       try {
@@ -314,20 +229,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } catch (err) {
         console.error('Open GitHub feature error:', err);
-      }
-    });
-  }
-
-  // 4. Telegram Bot Direct Link
-  if (btnOpenTelegramChat) {
-    btnOpenTelegramChat.addEventListener('click', async () => {
-      try {
-        const url = 'https://t.me/my_stickyshell_reports_bot';
-        if (window.stickyShellAPI && window.stickyShellAPI.openExternalUrl) {
-          await window.stickyShellAPI.openExternalUrl(url);
-        }
-      } catch (err) {
-        console.error('Open Telegram bot error:', err);
       }
     });
   }
