@@ -114,8 +114,7 @@ jobs:
             gh release create "$TAG" "${FILES[@]}" \
               --repo "$REPO" \
               --title "$TITLE" \
-              --notes "StickyShell Home official release for Windows, Linux, and macOS." \
-              --clobber
+              --notes "StickyShell Home official release for Windows, Linux, and macOS."
           fi
 
       - name: Publish Release to Public Home Repo (Optional)
@@ -146,7 +145,6 @@ jobs:
             gh release create "$TAG" "${FILES[@]}" \
               --repo "$REPO" \
               --title "$TITLE" \
-              --notes "StickyShell Home official release for Windows, Linux, and macOS." \
-              --clobber
+              --notes "StickyShell Home official release for Windows, Linux, and macOS."
           fi
 
