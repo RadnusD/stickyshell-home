@@ -137,10 +137,9 @@
         return invoke('resize_note_window', { width, height });
       },
 
-      // External Links, Diagnostics & Feedback
+      // External Links & Diagnostics
       openExternalUrl: (url) => invoke('open_external_url', { url: url || '' }),
       getSystemDiagnostics: () => invoke('get_system_diagnostics'),
-      sendTelegramReport: (message, userNote) => invoke('send_telegram_error_report', { message: message || '', userNote: userNote || null }),
 
       // Event Listeners
       onNoteLoaded: (callback) => {
@@ -215,7 +214,6 @@
       setWindowSize: async () => {},
       openExternalUrl: async (url) => { if (typeof window !== 'undefined' && url) window.open(url, '_blank'); },
       getSystemDiagnostics: async () => `### StickyShell Diagnostics Report (Mock)\n- OS: Browser Environment\n- Version: 1.0.0`,
-      sendTelegramReport: async () => true,
       onNoteLoaded: () => {},
       onTerminalsChanged: () => () => {}
     };
