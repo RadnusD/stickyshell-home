@@ -83,11 +83,11 @@ jobs:
 
       - name: Publish Release to Public Repository
         env:
-          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}"
           TITLE="${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.0.0' }}"
-          REPO="RadnusD/stickyshell-home"
+          REPO="${{ secrets.PUBLIC_RELEASE_TOKEN != '' && 'RadnusD/stickyshell-home' || github.repository }}"
 
           # Enable recursive globbing and ignore unmatched patterns
           shopt -s globstar nullglob
