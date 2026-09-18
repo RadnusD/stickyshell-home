@@ -1,16 +1,16 @@
-﻿# yaml-language-server: =https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+# yaml-language-server: =https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
 PackageIdentifier: RadnusD.StickyShell
 PackageVersion: 1.0.0
 PackageLocale: en-US
 Publisher: StickyShell
-PublisherUrl: https://github.com/RadnusD/stickyshell-source
-PublisherSupportUrl: https://github.com/RadnusD/stickyshell-source/issues
-PrivacyUrl: https://github.com/RadnusD/stickyshell-source/blob/main/PRIVACY.md
+PublisherUrl: https://github.com/RadnusD/stickyshell-home
+PublisherSupportUrl: https://github.com/RadnusD/stickyshell-home/issues
+PrivacyUrl: https://github.com/RadnusD/stickyshell-home/blob/main/PRIVACY.md
 Author: RadnusD
 PackageName: StickyShell Home
-PackageUrl: https://github.com/RadnusD/stickyshell-source
+PackageUrl: https://github.com/RadnusD/stickyshell-home
 License: Proprietary
-LicenseUrl: https://github.com/RadnusD/stickyshell-source/blob/main/LICENSE
+LicenseUrl: https://github.com/RadnusD/stickyshell-home/blob/main/LICENSE
 Copyright: Copyright (c) 2026 StickyShell / RadnusD. All Rights Reserved.
 ShortDescription: Lightweight cross-platform desktop sticky note with inline shell command execution.
 Description: |
