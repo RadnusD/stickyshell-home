@@ -85,8 +85,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}"
-          TITLE="${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.0.0' }}"
+          TAG="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.1.0' }}"
+          TITLE="${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.1.0' }}"
           REPO="${{ github.repository }}"
 
           # Enable recursive globbing and ignore unmatched patterns
@@ -123,8 +123,8 @@ jobs:
           GH_TOKEN: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
           HAS_TOKEN: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
         run: |
-          TAG="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}"
-          TITLE="${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.0.0' }}"
+          TAG="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.1.0' }}"
+          TITLE="${{ startsWith(github.ref, 'refs/tags/') && format('StickyShell Home {0}', github.ref_name) || 'StickyShell Home v1.1.0' }}"
           REPO="RadnusD/stickyshell-home"
 
           shopt -s globstar nullglob
