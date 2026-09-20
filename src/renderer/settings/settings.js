@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     linkGithubRepo.addEventListener('click', (e) => {
       e.preventDefault();
       if (window.stickyShellAPI && window.stickyShellAPI.openExternalUrl) {
-        window.stickyShellAPI.openExternalUrl('https://github.com/RadnusD');
+        window.stickyShellAPI.openExternalUrl('https://github.com/RadnusD/stickyshell-home');
       }
     });
   }
