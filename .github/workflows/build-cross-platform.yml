@@ -105,16 +105,27 @@ jobs:
             echo " - $f"
           done
 
+          # Determine release notes argument
+          if [ -f "RELEASE_NOTES.md" ]; then
+            NOTES_ARGS=(--notes-file "RELEASE_NOTES.md")
+          else
+            NOTES_ARGS=(--notes "StickyShell Home official release for Windows, Linux, and macOS.")
+          fi
+
           # Check if release already exists; update if so, else create
           if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
             echo "Release $TAG already exists on $REPO, uploading assets..."
             gh release upload "$TAG" "${FILES[@]}" --repo "$REPO" --clobber
+            if [ -f "RELEASE_NOTES.md" ]; then
+              echo "Updating release description from RELEASE_NOTES.md..."
+              gh release edit "$TAG" --repo "$REPO" --notes-file "RELEASE_NOTES.md"
+            fi
           else
             echo "Creating new release $TAG on $REPO..."
             gh release create "$TAG" "${FILES[@]}" \
               --repo "$REPO" \
               --title "$TITLE" \
-              --notes "StickyShell Home official release for Windows, Linux, and macOS."
+              "${NOTES_ARGS[@]}"
           fi
 
       - name: Publish Release to Public Home Repo (Optional)
@@ -137,14 +148,25 @@ jobs:
             release-artifacts/**/*.rpm
           )
 
+          # Determine release notes argument
+          if [ -f "RELEASE_NOTES.md" ]; then
+            NOTES_ARGS=(--notes-file "RELEASE_NOTES.md")
+          else
+            NOTES_ARGS=(--notes "StickyShell Home official release for Windows, Linux, and macOS.")
+          fi
+
           if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
             echo "Release $TAG already exists on $REPO, uploading assets..."
             gh release upload "$TAG" "${FILES[@]}" --repo "$REPO" --clobber
+            if [ -f "RELEASE_NOTES.md" ]; then
+              echo "Updating release description from RELEASE_NOTES.md..."
+              gh release edit "$TAG" --repo "$REPO" --notes-file "RELEASE_NOTES.md"
+            fi
           else
             echo "Creating new release $TAG on $REPO..."
             gh release create "$TAG" "${FILES[@]}" \
               --repo "$REPO" \
               --title "$TITLE" \
-              --notes "StickyShell Home official release for Windows, Linux, and macOS."
+              "${NOTES_ARGS[@]}"
           fi
 
