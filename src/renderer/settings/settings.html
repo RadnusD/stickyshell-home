@@ -111,114 +111,244 @@
       <!-- TAB 2: UI & Shortcuts Guide -->
       <section id="tab-guide" class="tab-pane">
         <div class="section-intro">
-          <h3>StickyShell Controls & Header UI Layout</h3>
-          <p>Visual map and functional reference for all controls and shortcuts:</p>
+          <h3>StickyShell Controls &amp; Shortcuts Guide</h3>
+          <p>Quick reference for keyboard shortcuts, execution superpowers, and note controls:</p>
         </div>
 
-        <div class="cards-grid">
-          <!-- 1. Run in Menu (1st box) -->
-          <div class="guide-card">
-            <div class="card-icon run-icon">▶</div>
-            <div class="card-info">
-              <h4>Run Command Execution</h4>
-              <span class="location-badge highlight-green">Menu Item</span>
-              <p>Execute shell commands directly in your chosen terminal.</p>
-              <ul class="feature-bullets">
-                <li>Click <strong>Run</strong> in 3-dot menu (or press <code>Ctrl+Enter</code>): Instant execution</li>
-                <li>Click <strong>Run Options</strong>: Opens folder & terminal picker flyout</li>
-                <li>Dual Execution: Run inline console drawer or launch external terminal</li>
-              </ul>
+        <!-- Shortcuts Quick Reference Table -->
+        <div class="guide-section-block">
+          <h4 class="guide-block-title">Keyboard Shortcuts Reference</h4>
+          <div class="shortcuts-table-wrapper">
+            <table class="shortcuts-table">
+              <thead>
+                <tr>
+                  <th>Shortcut</th>
+                  <th>Scope</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td>
+                  <td><span class="scope-pill">Active Note</span></td>
+                  <td><strong>Run Selection or Full Note</strong></td>
+                  <td>Runs highlighted text if selected; otherwise runs the entire note</td>
+                </tr>
+                <tr>
+                  <td><kbd>Ctrl</kbd> + <kbd>P</kbd></td>
+                  <td><span class="scope-pill">Active Note</span></td>
+                  <td><strong>Toggle Math &amp; Markdown Preview</strong></td>
+                  <td>Renders KaTeX formulas ($x$, $$\sum$$) and formatted text</td>
+                </tr>
+                <tr>
+                  <td><kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd></td>
+                  <td><span class="scope-pill global">Global</span></td>
+                  <td><strong>Show / Hide All Notes</strong></td>
+                  <td>Instantly summons or minimizes all notes across all monitors</td>
+                </tr>
+                <tr>
+                  <td><kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd></td>
+                  <td><span class="scope-pill global">Global</span></td>
+                  <td><strong>Create New Note</strong></td>
+                  <td>Spawns a new sticky note from anywhere in Windows</td>
+                </tr>
+                <tr>
+                  <td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td>
+                  <td><span class="scope-pill">Active Note</span></td>
+                  <td><strong>Text Undo</strong></td>
+                  <td>Reverts typing changes inside the note text area</td>
+                </tr>
+                <tr>
+                  <td><span class="menu-crumb">Menu &gt; Undo Delete</span></td>
+                  <td><span class="scope-pill buffer">Recovery</span></td>
+                  <td><strong>Restore Note from Buffer</strong></td>
+                  <td>Resurrects the last deleted note from the persistent buffer</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Advanced Superpowers & Features -->
+        <div class="guide-section-block">
+          <h4 class="guide-block-title">Execution Features &amp; Superpowers</h4>
+          <div class="cards-grid">
+            <!-- Feature 1: Highlight-to-Run -->
+            <div class="guide-card">
+              <div class="card-icon highlight-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 7V4h3"></path>
+                  <path d="M20 7V4h-3"></path>
+                  <path d="M4 17v3h3"></path>
+                  <path d="M20 17v3h-3"></path>
+                  <line x1="9" y1="12" x2="15" y2="12"></line>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Highlight-to-Run (Selective Execution)</h4>
+                <span class="location-badge highlight-green">Editor Feature</span>
+                <p>Highlight any line or code block inside your note and press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> (or click Run). StickyShell executes only that selection. When nothing is selected, the whole note executes.</p>
+              </div>
+            </div>
+
+            <!-- Feature 2: Multiline Block Execution -->
+            <div class="guide-card">
+              <div class="card-icon run-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Multiline Script Execution</h4>
+                <span class="location-badge">Terminal Feature</span>
+                <p>Multi-line PowerShell loops, batch scripts, and Bash scripts execute as complete cohesive scripts without line-by-line syntax errors. Console windows show a clean title without leaking temp paths.</p>
+              </div>
+            </div>
+
+            <!-- Feature 3: LaTeX Math & Markdown Preview -->
+            <div class="guide-card">
+              <div class="card-icon math-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19l4-14h4l4 14"></path>
+                  <line x1="6" y1="13" x2="14" y2="13"></line>
+                  <circle cx="19" cy="8" r="2"></circle>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>LaTeX Math &amp; Markdown Preview</h4>
+                <span class="location-badge">Preview Feature</span>
+                <p>KaTeX engine rendering is built in. Write inline math like <code>$E=mc^2$</code> or display blocks like <code>$$\sum_{i=1}^n i$$</code>. Press <kbd>Ctrl</kbd> + <kbd>P</kbd> or double-click to toggle preview.</p>
+              </div>
+            </div>
+
+            <!-- Feature 4: Per-Note Working Directory -->
+            <div class="guide-card">
+              <div class="card-icon folder-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Per-Note Working Directory</h4>
+                <span class="location-badge">System Feature</span>
+                <p>Bind individual notes to specific project directories. Click Menu &gt; Run Options and pick any folder. Commands executed from that note run directly inside that target directory.</p>
+              </div>
+            </div>
+
+            <!-- Feature 5: Always-on-Top Pinning -->
+            <div class="guide-card">
+              <div class="card-icon pin-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="17" x2="12" y2="22"></line>
+                  <path d="M5 17h14v-2l-2-2V5a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v8l-2 2v2z"></path>
+                  <circle cx="12" cy="3" r="1"></circle>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Always-on-Top Pinning</h4>
+                <span class="location-badge">Window Feature</span>
+                <p>Click the pin icon in the note header. When active, it turns vibrant red and floats above all full-screen windows, browsers, editors, and games. Pin state persists per note.</p>
+              </div>
+            </div>
+
+            <!-- Feature 6: Persistent Note Recovery Buffer -->
+            <div class="guide-card">
+              <div class="card-icon buffer-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Persistent Note Recovery Buffer</h4>
+                <span class="location-badge">Storage Feature</span>
+                <p>Accidentally closed or deleted a note? Closed notes are kept safe in the SQLite recovery buffer. Click Menu &gt; Undo Delete at any time (even after restarting the app) to restore the note.</p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- 2. Plus Button (New Note) -->
-          <div class="guide-card">
-            <div class="card-icon plus-icon">＋</div>
-            <div class="card-info">
-              <h4>New Note</h4>
-              <span class="location-badge">Header Item</span>
-              <p>Spawns an independent, frameless sticky note with its own working folder and persistent undo buffer.</p>
-              <ul class="feature-bullets">
-                <li>Shortcut: <code>＋</code> button or tray menu</li>
-                <li>Restored automatically upon next system restart</li>
-              </ul>
+        <!-- Sticky Note Header Controls -->
+        <div class="guide-section-block">
+          <h4 class="guide-block-title">Sticky Note Controls Reference</h4>
+          <div class="cards-grid">
+            <!-- Control 1: Plus Button -->
+            <div class="guide-card">
+              <div class="card-icon plus-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>New Note</h4>
+                <span class="location-badge">Header Bar</span>
+                <p>Spawns an independent, frameless sticky note with its own working folder, auto-save state, and execution history.</p>
+              </div>
             </div>
-          </div>
 
-          <!-- 3. Pin Button -->
-          <div class="guide-card">
-            <div class="card-icon menu-icon" style="background:#fee2e2;color:#dc2626;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="17" x2="12" y2="22"></line>
-                <path d="M5 17h14v-2l-2-2V5a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v8l-2 2v2z"></path>
-                <circle cx="12" cy="3" r="1"></circle>
-              </svg>
+            <!-- Control 2: Delete Button -->
+            <div class="guide-card">
+              <div class="card-icon delete-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Delete Note</h4>
+                <span class="location-badge">Header Bar</span>
+                <p>Closes and archives the note into the safe recovery buffer. Restorable anytime via Menu &gt; Undo Delete.</p>
+              </div>
             </div>
-            <div class="card-info">
-              <h4>Pin to Top (Always on Top)</h4>
-              <span class="location-badge">Header Item</span>
-              <p>Pins the current sticky note above all other operating system windows.</p>
-              <ul class="feature-bullets">
-                <li>Visual Indicator: Turns vibrant red when active</li>
-                <li>State is saved automatically per note</li>
-              </ul>
-            </div>
-          </div>
 
-          <!-- 4. Delete Button -->
-          <div class="guide-card">
-            <div class="card-icon delete-icon">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
+            <!-- Control 3: Context Menu -->
+            <div class="guide-card">
+              <div class="card-icon menu-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <circle cx="12" cy="5" r="2"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                  <circle cx="12" cy="19" r="2"></circle>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Three-Dot Menu</h4>
+                <span class="location-badge">Header Bar</span>
+                <p>Access Run, Run Options (terminal picker &amp; working directory), Undo Delete, Settings, and application controls.</p>
+              </div>
             </div>
-            <div class="card-info">
-              <h4>Delete Note & Undo Buffer</h4>
-              <span class="location-badge">Header Item</span>
-              <p>Closes and moves the note to the safe Undo Buffer with confirmation safety.</p>
-              <ul class="feature-bullets">
-                <li>Undo: Open 3-dot menu and click <strong>Undo Delete</strong></li>
-                <li>Permanent deletion only when cleared</li>
-              </ul>
-            </div>
-          </div>
 
-          <!-- 5. Three-Dot Menu -->
-          <div class="guide-card">
-            <div class="card-icon menu-icon">⋮</div>
-            <div class="card-info">
-              <h4>Three-Dot Context Menu</h4>
-              <span class="location-badge">Header Item</span>
-              <p>Access notes management, undo buffer, settings, and application controls.</p>
+            <!-- Control 4: Close Window -->
+            <div class="guide-card">
+              <div class="card-icon close-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>Close Window (Hide to Tray)</h4>
+                <span class="location-badge">Header Bar</span>
+                <p>Hides the note to the system tray without data loss. Content is auto-saved before hiding.</p>
+              </div>
             </div>
-          </div>
 
-          <!-- 6. Close Button -->
-          <div class="guide-card">
-            <div class="card-icon close-icon">✕</div>
-            <div class="card-info">
-              <h4>Close Window</h4>
-              <span class="location-badge">Header Item</span>
-              <p>Hides the note while keeping StickyShell active in the system tray.</p>
-              <ul class="feature-bullets">
-                <li>Zero data loss: content is auto-saved before closing</li>
-                <li>Re-open anytime from the Windows Taskbar Notification area</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 7. System Tray -->
-          <div class="guide-card">
-            <div class="card-icon tray-icon">⚡</div>
-            <div class="card-info">
-              <h4>System Tray Notification Area</h4>
-              <span class="location-badge">Taskbar Notification Tray</span>
-              <p>StickyShell runs silently in the background.</p>
-              <ul class="feature-bullets">
-                <li>Right-click tray: Restore all notes, New note, Settings, Exit</li>
-                <li>Left-click tray: Instantly summon or hide all sticky notes</li>
-              </ul>
+            <!-- Control 5: System Tray -->
+            <div class="guide-card">
+              <div class="card-icon tray-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h4>System Tray Area</h4>
+                <span class="location-badge">Taskbar Notification</span>
+                <p>StickyShell runs in background. Left-click to summon/hide notes; right-click for quick actions, new note, settings, or exit.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -228,7 +358,7 @@
       <section id="tab-compare" class="tab-pane">
         <div class="section-intro">
           <h3>StickyShell Edition Comparison</h3>
-          <p>Feature comparison between Home Edition and Developer Edition:</p>
+          <p>Feature comparison between Home Edition and Pro Edition (Coming Soon):</p>
         </div>
 
         <div class="compare-table-wrapper">
@@ -242,9 +372,9 @@
                   <div class="edition-sub">Essential & Offline</div>
                 </th>
                 <th class="col-edition col-dev">
-                  <span class="edition-pill pro-pill">PRO / DEV</span>
-                  <div class="edition-name">Developer Edition</div>
-                  <div class="edition-sub">DevOps & Automation</div>
+                  <span class="edition-pill pro-pill">COMING SOON</span>
+                  <div class="edition-name">StickyShell Pro</div>
+                  <div class="edition-sub">Pro Edition</div>
                 </th>
               </tr>
             </thead>

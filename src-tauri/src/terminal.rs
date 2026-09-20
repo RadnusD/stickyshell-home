@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::PathBuf;
 use std::process::Command;
-use std::time::Instant;
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TerminalInfo {
@@ -34,6 +36,55 @@ pub fn get_default_working_dir() -> String {
     {
         std::env::var("HOME").unwrap_or_else(|_| ".".to_string())
     }
+}
+
+pub fn create_temp_script(shell_id: &str, content: &str, is_external: bool) -> Result<PathBuf, String> {
+    let temp_dir = std::env::temp_dir();
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos();
+
+    let extension = match shell_id {
+        "powershell" => "ps1",
+        "cmd" => "bat",
+        _ => "sh",
+    };
+
+    let file_path = temp_dir.join(format!("stickyshell_run_{}.{}", timestamp, extension));
+
+    #[cfg(target_os = "windows")]
+    {
+        if extension == "bat" {
+            let normalized = content.replace("\r\n", "\n").replace('\n', "\r\n");
+            let mut script = String::new();
+            script.push_str("@echo off\r\ntitle StickyShell\r\necho [Running via StickyShell]\r\necho.\r\n");
+            script.push_str(&normalized);
+            if is_external {
+                script.push_str("\r\n(goto) 2>nul & del \"%~f0\"\r\n");
+            }
+            fs::write(&file_path, script).map_err(|e| e.to_string())?;
+            return Ok(file_path);
+        } else if extension == "ps1" {
+            let mut script = String::new();
+            script.push_str("$host.ui.RawUI.WindowTitle = 'StickyShell'\r\nWrite-Host '[Running via StickyShell]'\r\n");
+            script.push_str(content);
+            fs::write(&file_path, script).map_err(|e| e.to_string())?;
+            return Ok(file_path);
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let mut script = String::new();
+        script.push_str("#!/bin/bash\necho '[Running via StickyShell]'\n");
+        script.push_str(content);
+        fs::write(&file_path, script).map_err(|e| e.to_string())?;
+        return Ok(file_path);
+    }
+
+    fs::write(&file_path, content).map_err(|e| e.to_string())?;
+    Ok(file_path)
 }
 
 pub struct TerminalRunner;
@@ -129,35 +180,91 @@ impl TerminalRunner {
             target_dir = &default_dir;
         }
 
+        let is_multiline = command.contains('\n');
+
         #[cfg(target_os = "windows")]
         {
             use std::os::windows::process::CommandExt;
             const CREATE_NEW_CONSOLE: u32 = 0x00000010;
 
-            match _terminal_id {
-                "powershell" => {
-                    let mut cmd = Command::new("powershell.exe");
-                    cmd.current_dir(target_dir);
-                    cmd.creation_flags(CREATE_NEW_CONSOLE);
-                    cmd.args(["-NoExit", "-Command", command]);
-                    cmd.spawn()
-                        .map_err(|e| format!("Failed to spawn PowerShell: {}", e))?;
+            if is_multiline {
+                let script_path = create_temp_script(_terminal_id, command, true)?;
+                let script_str = script_path.to_string_lossy().to_string();
+                let escaped_ps_path = script_str.replace('\'', "''");
+
+                match _terminal_id {
+                    "powershell" => {
+                        let mut cmd = Command::new("powershell.exe");
+                        cmd.current_dir(target_dir);
+                        cmd.creation_flags(CREATE_NEW_CONSOLE);
+                        cmd.args([
+                            "-NoExit",
+                            "-ExecutionPolicy",
+                            "Bypass",
+                            "-Command",
+                            &format!(
+                                "& {{ & '{}'; Remove-Item -LiteralPath '{}' -Force }}",
+                                escaped_ps_path, escaped_ps_path
+                            ),
+                        ]);
+                        cmd.spawn()
+                            .map_err(|e| format!("Failed to spawn PowerShell: {}", e))?;
+                    }
+                    "wt" => {
+                        let mut cmd = Command::new("wt.exe");
+                        cmd.current_dir(target_dir);
+                        cmd.args([
+                            "-d",
+                            target_dir,
+                            "powershell",
+                            "-NoExit",
+                            "-ExecutionPolicy",
+                            "Bypass",
+                            "-Command",
+                            &format!(
+                                "& {{ & '{}'; Remove-Item -LiteralPath '{}' -Force }}",
+                                escaped_ps_path, escaped_ps_path
+                            ),
+                        ]);
+                        cmd.spawn()
+                            .map_err(|e| format!("Failed to spawn Windows Terminal: {}", e))?;
+                    }
+                    _ => {
+                        // Default cmd.exe: runs self-deleting script, keeping prompt open
+                        let mut cmd = Command::new("cmd.exe");
+                        cmd.current_dir(target_dir);
+                        cmd.creation_flags(CREATE_NEW_CONSOLE);
+                        cmd.args(["/k", &script_str]);
+                        cmd.spawn()
+                            .map_err(|e| format!("Failed to spawn CMD: {}", e))?;
+                    }
                 }
-                "wt" => {
-                    let mut cmd = Command::new("wt.exe");
-                    cmd.current_dir(target_dir);
-                    cmd.args(["-d", target_dir, "powershell", "-NoExit", "-Command", command]);
-                    cmd.spawn()
-                        .map_err(|e| format!("Failed to spawn Windows Terminal: {}", e))?;
-                }
-                _ => {
-                    // Default cmd.exe
-                    let mut cmd = Command::new("cmd.exe");
-                    cmd.current_dir(target_dir);
-                    cmd.creation_flags(CREATE_NEW_CONSOLE);
-                    cmd.args(["/k", command]);
-                    cmd.spawn()
-                        .map_err(|e| format!("Failed to spawn CMD: {}", e))?;
+            } else {
+                match _terminal_id {
+                    "powershell" => {
+                        let mut cmd = Command::new("powershell.exe");
+                        cmd.current_dir(target_dir);
+                        cmd.creation_flags(CREATE_NEW_CONSOLE);
+                        cmd.args(["-NoExit", "-Command", command]);
+                        cmd.spawn()
+                            .map_err(|e| format!("Failed to spawn PowerShell: {}", e))?;
+                    }
+                    "wt" => {
+                        let mut cmd = Command::new("wt.exe");
+                        cmd.current_dir(target_dir);
+                        cmd.args(["-d", target_dir, "powershell", "-NoExit", "-Command", command]);
+                        cmd.spawn()
+                            .map_err(|e| format!("Failed to spawn Windows Terminal: {}", e))?;
+                    }
+                    _ => {
+                        // Default cmd.exe
+                        let mut cmd = Command::new("cmd.exe");
+                        cmd.current_dir(target_dir);
+                        cmd.creation_flags(CREATE_NEW_CONSOLE);
+                        cmd.args(["/k", command]);
+                        cmd.spawn()
+                            .map_err(|e| format!("Failed to spawn CMD: {}", e))?;
+                    }
                 }
             }
         }
@@ -170,55 +277,110 @@ impl TerminalRunner {
                 _terminal_id.to_string()
             };
 
-            match term.as_str() {
-                "kitty" | "alacritty" | "wezterm" => {
-                    Command::new(&term)
-                        .args([
-                            "--working-directory",
-                            target_dir,
-                            "-e",
-                            "bash",
-                            "-c",
-                            &format!("{}; exec bash", command),
-                        ])
-                        .spawn()
-                        .map_err(|e| e.to_string())?;
+            if is_multiline {
+                let script_path = create_temp_script(_terminal_id, command, true)?;
+                let script_str = script_path.to_string_lossy().to_string();
+                let launch_cmd = format!("bash '{}'; rm -f '{}'; exec bash", script_str, script_str);
+                match term.as_str() {
+                    "kitty" | "alacritty" | "wezterm" => {
+                        Command::new(&term)
+                            .args([
+                                "--working-directory",
+                                target_dir,
+                                "-e",
+                                "bash",
+                                "-c",
+                                &launch_cmd,
+                            ])
+                            .spawn()
+                            .map_err(|e| e.to_string())?;
+                    }
+                    "gnome-terminal" | "konsole" | "xfce4-terminal" => {
+                        Command::new(&term)
+                            .args([
+                                "--working-directory",
+                                target_dir,
+                                "--",
+                                "bash",
+                                "-c",
+                                &launch_cmd,
+                            ])
+                            .spawn()
+                            .map_err(|e| e.to_string())?;
+                    }
+                    _ => {
+                        Command::new("sh")
+                            .args([
+                                "-c",
+                                &format!(
+                                    "cd '{}' && xterm -e 'bash -c \"{}\"'",
+                                    target_dir, launch_cmd
+                                ),
+                            ])
+                            .spawn()
+                            .map_err(|e| e.to_string())?;
+                    }
                 }
-                "gnome-terminal" | "konsole" | "xfce4-terminal" => {
-                    Command::new(&term)
-                        .args([
-                            "--working-directory",
-                            target_dir,
-                            "--",
-                            "bash",
-                            "-c",
-                            &format!("{}; exec bash", command),
-                        ])
-                        .spawn()
-                        .map_err(|e| e.to_string())?;
-                }
-                _ => {
-                    Command::new("sh")
-                        .args([
-                            "-c",
-                            &format!(
-                                "cd '{}' && xterm -e 'bash -c \"{}; exec bash\"'",
-                                target_dir, command
-                            ),
-                        ])
-                        .spawn()
-                        .map_err(|e| e.to_string())?;
+            } else {
+                match term.as_str() {
+                    "kitty" | "alacritty" | "wezterm" => {
+                        Command::new(&term)
+                            .args([
+                                "--working-directory",
+                                target_dir,
+                                "-e",
+                                "bash",
+                                "-c",
+                                &format!("{}; exec bash", command),
+                            ])
+                            .spawn()
+                            .map_err(|e| e.to_string())?;
+                    }
+                    "gnome-terminal" | "konsole" | "xfce4-terminal" => {
+                        Command::new(&term)
+                            .args([
+                                "--working-directory",
+                                target_dir,
+                                "--",
+                                "bash",
+                                "-c",
+                                &format!("{}; exec bash", command),
+                            ])
+                            .spawn()
+                            .map_err(|e| e.to_string())?;
+                    }
+                    _ => {
+                        Command::new("sh")
+                            .args([
+                                "-c",
+                                &format!(
+                                    "cd '{}' && xterm -e 'bash -c \"{}; exec bash\"'",
+                                    target_dir, command
+                                ),
+                            ])
+                            .spawn()
+                            .map_err(|e| e.to_string())?;
+                    }
                 }
             }
         }
 
         #[cfg(target_os = "macos")]
         {
-            let applescript = format!(
-                "tell application \"Terminal\" to do script \"cd '{}' && {}\"",
-                target_dir,
-                command.replace('"', "\\\"")
-            );
+            let applescript = if is_multiline {
+                let script_path = create_temp_script(_terminal_id, command, true)?;
+                let script_str = script_path.to_string_lossy().to_string();
+                format!(
+                    "tell application \"Terminal\" to do script \"cd '{}' && bash '{}'; rm -f '{}'\"",
+                    target_dir, script_str, script_str
+                )
+            } else {
+                format!(
+                    "tell application \"Terminal\" to do script \"cd '{}' && {}\"",
+                    target_dir,
+                    command.replace('"', "\\\"")
+                )
+            };
             Command::new("osascript")
                 .args(["-e", &applescript])
                 .spawn()
@@ -240,25 +402,52 @@ impl TerminalRunner {
             target_dir = &default_dir;
         }
 
+        let is_multiline = command.contains('\n');
+
         #[cfg(target_os = "windows")]
         {
-            let output = if _terminal_id == "powershell" {
-                let mut cmd = Command::new("powershell.exe");
-                cmd.current_dir(target_dir);
-                cmd.args([
-                    "-NoProfile",
-                    "-NonInteractive",
-                    "-Command",
-                    command,
-                ])
-                .output()
-                .map_err(|e| e.to_string())?
+            let output = if is_multiline {
+                let script_path = create_temp_script(_terminal_id, command, false)?;
+                let script_str = script_path.to_string_lossy().to_string();
+
+                let res = if _terminal_id == "powershell" {
+                    let mut cmd = Command::new("powershell.exe");
+                    cmd.current_dir(target_dir);
+                    cmd.args([
+                        "-NoProfile",
+                        "-NonInteractive",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-File",
+                        &script_str,
+                    ]);
+                    cmd.output()
+                } else {
+                    let mut cmd = Command::new("cmd.exe");
+                    cmd.current_dir(target_dir);
+                    cmd.args(["/c", &script_str]);
+                    cmd.output()
+                };
+
+                let _ = fs::remove_file(&script_path);
+                res.map_err(|e| e.to_string())?
             } else {
-                let mut cmd = Command::new("cmd.exe");
-                cmd.current_dir(target_dir);
-                cmd.args(["/c", command])
-                    .output()
-                    .map_err(|e| e.to_string())?
+                if _terminal_id == "powershell" {
+                    let mut cmd = Command::new("powershell.exe");
+                    cmd.current_dir(target_dir);
+                    cmd.args([
+                        "-NoProfile",
+                        "-NonInteractive",
+                        "-Command",
+                        command,
+                    ]);
+                    cmd.output().map_err(|e| e.to_string())?
+                } else {
+                    let mut cmd = Command::new("cmd.exe");
+                    cmd.current_dir(target_dir);
+                    cmd.args(["/c", command]);
+                    cmd.output().map_err(|e| e.to_string())?
+                }
             };
 
             let duration_ms = start.elapsed().as_millis();
@@ -276,10 +465,24 @@ impl TerminalRunner {
 
         #[cfg(not(target_os = "windows"))]
         {
-            let output = Command::new("bash")
-                .args(["-c", &format!("cd '{}' && {}", target_dir, command)])
-                .output()
-                .map_err(|e| e.to_string())?;
+            let output = if is_multiline {
+                let script_path = create_temp_script(_terminal_id, command, false)?;
+                let script_str = script_path.to_string_lossy().to_string();
+
+                let res = Command::new("bash")
+                    .current_dir(target_dir)
+                    .args([&script_str])
+                    .output();
+
+                let _ = fs::remove_file(&script_path);
+                res.map_err(|e| e.to_string())?
+            } else {
+                Command::new("bash")
+                    .current_dir(target_dir)
+                    .args(["-c", &format!("cd '{}' && {}", target_dir, command)])
+                    .output()
+                    .map_err(|e| e.to_string())?
+            };
 
             let duration_ms = start.elapsed().as_millis();
             let stdout = String::from_utf8_lossy(&output.stdout).to_string();
