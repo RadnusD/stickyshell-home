@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Output Pane
   const outputWrapper = document.getElementById('output-wrapper');
+  const outputScrollPane = document.getElementById('output-scroll-pane');
   const outputStatusPill = document.getElementById('output-status-pill');
   const noteOutputPre = document.getElementById('note-output-pre');
   const btnCopyOutput = document.getElementById('btn-copy-output');
@@ -72,23 +73,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   function adjustEditorHeight() {
     if (!noteEditorArea || !noteTextarea || !outputWrapper) return;
     if (outputWrapper.classList.contains('hidden')) {
-      noteEditorArea.style.flex = '1';
+      noteEditorArea.style.flex = '1 1 auto';
       noteEditorArea.style.height = 'auto';
+      noteEditorArea.style.maxHeight = 'none';
+      outputWrapper.style.flex = '0 0 auto';
+      if (outputScrollPane) {
+        outputScrollPane.style.height = 'auto';
+      }
       return;
     }
 
-    const text = noteTextarea.value || '';
-    const lineCount = Math.max(1, text.split('\n').length);
-    const totalLines = lineCount + 2;
-    const lineHeight = 20;
-    const neededHeight = totalLines * lineHeight + 6;
+    // Output is visible:
+    // 1. Give the note editor a comfortable content-based height (clamped)
+    const noteText = noteTextarea.value || '';
+    const noteLines = Math.max(1, noteText.split('\n').length);
+    const contentNoteHeight = noteLines * 20 + 8;
+    const availableBody = stickyBody ? stickyBody.clientHeight : 220;
 
-    const availableBodyHeight = stickyBody ? stickyBody.clientHeight : 220;
-    const maxEditorHeight = Math.max(64, availableBodyHeight * 0.62);
-    const finalHeight = Math.min(neededHeight, maxEditorHeight);
+    // Pin note editor to comfortable height (min 48px, max 42% of body height)
+    const clampedNoteHeight = Math.max(48, Math.min(contentNoteHeight, Math.floor(availableBody * 0.42)));
 
     noteEditorArea.style.flex = '0 0 auto';
-    noteEditorArea.style.height = `${finalHeight}px`;
+    noteEditorArea.style.height = `${clampedNoteHeight}px`;
+
+    // 2. Output wrapper and scroll pane take flex: 1 1 auto so all vertical resizing expands the output box
+    outputWrapper.style.flex = '1 1 auto';
+    outputWrapper.style.minHeight = '60px';
+    outputWrapper.style.height = 'auto';
+
+    if (outputScrollPane) {
+      outputScrollPane.style.flex = '1 1 auto';
+      outputScrollPane.style.height = '100%';
+      outputScrollPane.style.maxHeight = 'none';
+
+      const outputText = noteOutputPre ? (noteOutputPre.textContent || '') : '';
+      const rawLines = outputText.trim() ? outputText.trim().split('\n').length : 1;
+      const minLines = Math.min(Math.max(rawLines, 2), 4);
+      outputScrollPane.style.minHeight = `${minLines * 18 + 8}px`;
+    }
   }
 
   function showStatus(text, isError = false) {

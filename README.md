@@ -1,119 +1,139 @@
-# 📌 StickyShell Home
+# StickyShell Home
 
-<p align="center">
-  <strong>A lightweight, cross-platform desktop sticky note that doubles as an executable shell scratchpad.</strong>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version 1.0.0" />
-  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-brightgreen.svg" alt="Platform Support" />
-  <img src="https://img.shields.io/badge/built%20with-Tauri%20v2%20%2B%20Rust-orange.svg" alt="Tauri v2 + Rust" />
-  <img src="https://img.shields.io/badge/privacy-100%25%20Offline-green.svg" alt="100% Offline" />
-  <img src="https://img.shields.io/badge/license-Proprietary-red.svg" alt="License" />
-</p>
+A lightweight desktop sticky note application that allows you to write notes and run shell commands directly from your desktop. Built with Tauri v2, Rust, and standard web technologies.
 
 ---
 
-## 📥 Downloads (Version 1.0.0)
+## Downloads (v1.1.0)
 
-Download the official release for your operating system:
+Pre-built binaries are available for Windows, macOS, and Linux:
 
 | Platform | Package | Architecture | Download Link |
 | :--- | :--- | :--- | :--- |
-| **Windows** | **Setup Installer (`.exe`)** | 64-bit (x64) | [**Download Setup (.exe)**](../../releases/latest) |
-| **Windows** | **Enterprise Package (`.msi`)** | 64-bit (x64) | [**Download MSI (.msi)**](../../releases/latest) |
-| **Windows** | **Portable Binary (`.exe`)** | 64-bit (x64) | [**Download Portable (.exe)**](../../releases/latest) |
-| **macOS** | **Disk Image (`.dmg`)** | Universal (Apple Silicon & Intel) | [**Download DMG (.dmg)**](../../releases/latest) |
-| **Linux** | **Debian Package (`.deb`)** | 64-bit (amd64) | [**Download DEB (.deb)**](../../releases/latest) |
-| **Linux** | **Standalone AppImage** | 64-bit (x86_64) | [**Download AppImage**](../../releases/latest) |
+| Windows | Setup Installer (.exe) | 64-bit (x64) | [Download Setup (.exe)](../../releases/latest) |
+| Windows | MSI Package (.msi) | 64-bit (x64) | [Download MSI (.msi)](../../releases/latest) |
+| Windows | Standalone (.exe) | 64-bit (x64) | [Download Standalone (.exe)](../../releases/latest) |
+| macOS | Disk Image (.dmg) | Universal (Apple Silicon & Intel) | [Download DMG (.dmg)](../../releases/latest) |
+| Linux | Debian Package (.deb) | 64-bit (amd64) | [Download DEB (.deb)](../../releases/latest) |
+| Linux | AppImage | 64-bit (x86_64) | [Download AppImage](../../releases/latest) |
 
-*All installation files are also available on the official [**GitHub Releases**](../../releases) page.*
-
----
-
-## 🌟 What is StickyShell?
-
-**StickyShell Home** combines the everyday convenience of sticky notes with the utility of an instant command-line scratchpad. 
-
-Whether you are saving quick snippets, drafting code, or running diagnostics, StickyShell lets you execute commands right from your sticky note without ever breaking your workflow or managing multiple terminal windows.
+You can also find all release files on the [GitHub Releases](../../releases) page.
 
 ---
 
-## ✨ Features
+## Features
 
-- 💻 **Dual Execution Modes**:
-  - **Inline Capture (`▶`)**: Captures output and errors in a slide-out drawer with one-click copy.
-  - **External Console (`👁`)**: Opens an interactive system console (CMD or PowerShell) for interactive workflows.
-- 📌 **Always on Top (Pinning)**: Keep your active note floating above other windows with a single click.
-- 🛡️ **Accidental Delete Protection**:
-  - Optional **"Confirm Before Deleting Notes"** safety prompt.
-  - Persistent **Undo Delete Buffer**: Restore closed or deleted notes with `Ctrl+Z`, even after restarting your computer.
-- ⚡ **Global Shortcuts**:
-  - `Win + Alt + S`: Show or hide all sticky notes instantly.
-  - `Win + Alt + N`: Spawn a new note at any time.
-- 📂 **Custom Working Folders**: Set per-note working directories, or fall back to your user home profile.
-- 🔒 **100% Offline & Private**: Zero cloud sync, zero tracking, zero accounts. All notes and settings are stored locally on your machine in standard JSON format.
+- Multi-Line Block Execution: Run single commands or multi-line shell scripts directly from your note.
+- Dual Execution Modes:
+  - Inline Capture (Ctrl + Enter): Runs commands quietly and captures stdout/stderr in an expandable output drawer.
+  - External Console (Ctrl + Shift + Enter): Opens a native interactive terminal window (CMD, PowerShell, or Bash).
+- Always on Top: Pin any note to keep it floating above other active windows.
+- Custom Working Directories: Configure specific working directories per note, or default to your user profile directory.
+- Start on Startup: Optional toggle in settings to launch StickyShell when your computer boots.
+- 100% Offline: Notes and settings are stored locally on your machine in standard JSON format. No cloud sync, no tracking, and no external network calls.
 
 ---
 
-## 🖥️ Installation Guide
+## Building from Source
 
-### Windows
-1. Download `StickyShell Home_1.0.0_x64-setup.exe`.
-2. Run the installer and follow the setup wizard.
-3. Launch **StickyShell Home** from your Desktop or Start Menu.
+If you prefer to inspect the source code and compile the application yourself, you can build it in a few steps.
 
-### macOS
-1. Download `StickyShell Home_1.0.0_universal.dmg`.
-2. Open the disk image and drag **StickyShell Home** into your **Applications** folder.
-3. Open the app from Applications or Spotlight.
+### Prerequisites
 
-### Linux
-- **Debian / Ubuntu**:
-  ```bash
-  sudo dpkg -i stickyshell-home_1.0.0_amd64.deb
-  ```
-- **AppImage**:
-  ```bash
-  chmod +x stickyshell-home_1.0.0_amd64.AppImage
-  ./stickyshell-home_1.0.0_amd64.AppImage
-  ```
+- Node.js (version 18 or higher)
+- Rust and Cargo (latest stable release from https://rustup.rs)
+- Platform-specific build tools:
+  - Windows: Visual Studio C++ Build Tools and WebView2 (pre-installed on Windows 10/11)
+  - Linux: `libwebkit2gtk-4.1-dev`, `build-essential`, `curl`, `wget`, `file`, `libssl-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev`
+  - macOS: Xcode Command Line Tools (`xcode-select --install`)
+
+### Build Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/RadnusD/stickyshell-home.git
+   cd stickyshell-home
+   ```
+
+2. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Run in development mode:
+   ```bash
+   npm run dev
+   ```
+
+4. Compile production binaries and installers:
+   ```bash
+   npm run build
+   ```
+
+The compiled binaries and installer packages will be located in:
+`src-tauri/target/release/bundle/`
 
 ---
 
-## ⌨️ Keyboard Shortcuts Reference
+## Antivirus and Safety Information
+
+### Why might Windows SmartScreen or antivirus software flag new builds?
+
+StickyShell Home is an open-source desktop application that executes local shell commands upon user request. Because official code signing certificates for individual developers are prohibitively expensive, release binaries are not signed with a Microsoft Authenticode certificate.
+
+As a result:
+- Windows SmartScreen may show an "Unknown Publisher" or "Windows protected your PC" warning.
+- Some antivirus heuristics may flag unsigned executables that have the capability to launch terminal processes.
+
+The full source code of StickyShell is open for inspection. You can review every line of code in this repository, check the file hashes below, or build the application from source using the instructions above.
+
+### SHA-256 Checksums (v1.1.0)
+
+| File | SHA-256 Checksum |
+| :--- | :--- |
+| `StickyShell Home_1.0.0_x64-setup.exe` | `787C8566A7730DE8EDB840C9600EF436960BDF8CB85A894E7C6E7CE7296589DD` |
+| `stickyshell-home.exe` | `4366263586D0C34B89B39366B81A625E7C9310A20F57F07A1B8B9AA746EAD1BF` |
+| `StickyShell Home_1.0.0_x64_en-US.msi` | `81033BB670F51E27767DBFB5E805D850B49A20205732CAE6F9BFAD17C64376FF` |
+
+You can independently upload and verify any release binary on [VirusTotal](https://www.virustotal.com/gui/home/upload).
+
+---
+
+## Keyboard Shortcuts
 
 | Shortcut | Action |
 | :--- | :--- |
-| `Win + Alt + S` | Toggle (Show/Hide) all sticky notes |
-| `Win + Alt + N` | Create a new sticky note |
-| `Ctrl + Enter` | Run command (Inline Capture mode) |
-| `Ctrl + Shift + Enter` | Run command (External Console mode) |
-| `Ctrl + Z` | Undo note deletion (from 3-dot menu or shortcut) |
+| Win + Alt + S | Show or hide all sticky notes |
+| Win + Alt + N | Create a new sticky note |
+| Ctrl + Enter | Run note content (Inline Capture) |
+| Ctrl + Shift + Enter | Run note content (External Console) |
 
 ---
 
-## 🔒 Privacy & Local Storage
+## Local Storage Locations
 
-StickyShell respects your complete privacy:
-- **No telemetry or analytics.**
-- **No cloud connections.**
-- All notes and configuration are stored locally on your hard drive:
-  - **Windows**: `%APPDATA%\com.stickyshell.home\stickyshell_data.json`
-  - **macOS**: `~/Library/Application Support/com.stickyshell.home/stickyshell_data.json`
-  - **Linux**: `~/.config/com.stickyshell.home/stickyshell_data.json`
+All user notes and application settings are kept entirely on your local machine:
+
+- Windows: `%APPDATA%\com.stickyshell.home\stickyshell_data.json`
+- macOS: `~/Library/Application Support/com.stickyshell.home/stickyshell_data.json`
+- Linux: `~/.config/com.stickyshell.home/stickyshell_data.json`
 
 ---
 
-## 💬 Feedback & Support
+## StickyShell Pro (In Development)
 
-Encountered a bug or have a suggestion?
-- Open an issue on our [**Issues Tracker**](../../issues).
+A Pro edition of StickyShell is currently under active development. Upcoming features include multi-tab notes, persistent session management, environment variable presets, and customizable hotkey macros.
 
 ---
 
-## 📄 License & Copyright
+## Support and Feedback
 
-**Copyright © 2026 StickyShell. All rights reserved.**
+If you encounter an issue or have a suggestion:
+- Check existing discussions or submit a report on our [Issues Tracker](../../issues).
 
-This software is proprietary and confidential. Unauthorized copying, distribution, modification, reverse engineering, decompilation, or disassembly of this software or its binaries is strictly prohibited.
+---
+
+## License
+
+Copyright (c) 2026 StickyShell / RadnusD. All rights reserved.
+See [LICENSE](LICENSE) for details.

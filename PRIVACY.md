@@ -1,16 +1,17 @@
-﻿# 🔒 Privacy Policy for StickyShell Home
+# Privacy Policy
 
 **Last Updated: 2026**
 
-StickyShell Home is committed to protecting your privacy and ensuring you have complete control over your data. 
+StickyShell Home is committed to privacy and local data control.
 
 ---
 
-## 1. 100% Offline & Zero Telemetry
-StickyShell Home operates **entirely offline** on your local device:
-- **No Analytics / Telemetry**: StickyShell does not track your app usage, active features, session duration, or personal habits.
-- **No Background Network Connections**: The application binary makes zero outgoing background network requests.
-- **No Cloud Sync or Accounts**: StickyShell does not require user registration, passwords, or cloud accounts.
+## 1. Offline Operation and Zero Telemetry
+
+StickyShell Home operates entirely offline on your local device:
+- No Analytics / Telemetry: StickyShell does not track your app usage, active features, session duration, or personal habits.
+- No Background Network Connections: The application makes zero outgoing background network requests.
+- No Cloud Sync or Accounts: StickyShell does not require user registration, passwords, or cloud accounts.
 
 ---
 
