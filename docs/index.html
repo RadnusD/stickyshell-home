@@ -3,214 +3,842 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StickyShell Home - The Executable Desktop Sticky Note</title>
-  <meta name="description" content="A lightweight, cross-platform desktop sticky note that doubles as an instant executable shell scratchpad.">
+  <title>StickyShell Home - Desktop Sticky Notes with Built-in Shell Execution</title>
+  <meta name="description" content="A fast desktop sticky note application that doubles as an instant shell scratchpad. Run commands inline, pin notes to desktop, 100% offline.">
+  <link rel="icon" type="image/png" href="icon.png">
   <style>
     :root {
       --primary: #f59e0b;
       --primary-hover: #d97706;
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --surface-border: #334155;
+      --primary-light: #fbbf24;
+      --bg: #0b0f19;
+      --surface: #131c2e;
+      --surface-card: #182338;
+      --surface-border: #24324a;
+      --surface-hover: #1e2c45;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --accent: #38bdf8;
+      --text-subtle: #64748b;
+      --accent-cyan: #38bdf8;
+      --accent-green: #34d399;
       --radius: 12px;
+      --radius-sm: 8px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    body { background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
-    .container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
-    
-    /* Header & Nav */
-    header { padding: 32px 0 20px; border-bottom: 1px solid var(--surface-border); }
-    .nav { display: flex; align-items: center; justify-content: space-between; }
-    .logo-group { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 700; color: var(--text); text-decoration: none; }
-    .nav-links { display: flex; gap: 20px; align-items: center; }
-    .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
-    .nav-link:hover { color: var(--text); }
-    .btn-gh { display: inline-flex; align-items: center; gap: 8px; background: #273549; color: #fff; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--surface-border); }
-    .btn-gh:hover { background: #334155; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
 
-    /* Hero */
-    .hero { text-align: center; padding: 80px 0 60px; }
-    .hero-badge { display: inline-block; background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 14px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
-    .hero h1 { font-size: 3.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 20px; letter-spacing: -0.02em; }
-    .hero h1 span { background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero p { font-size: 1.25rem; color: var(--text-muted); max-width: 680px; margin: 0 auto 36px; }
-    
-    /* Download Buttons */
-    .downloads-grid { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }
-    .btn-dl { display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: #000; padding: 14px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 1rem; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25); transition: transform 0.15s, background 0.15s; }
-    .btn-dl:hover { background: var(--primary-hover); transform: translateY(-2px); }
-    .btn-dl-sub { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); color: var(--text); padding: 14px 20px; border-radius: 10px; font-weight: 600; text-decoration: none; border: 1px solid var(--surface-border); transition: background 0.15s; }
-    .btn-dl-sub:hover { background: #273549; }
+    /* Header & Navigation */
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--surface-border);
+      position: sticky;
+      top: 0;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: block;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-link:hover {
+      color: var(--text);
+    }
+    .btn-gh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid var(--surface-border);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-gh:hover {
+      background: var(--surface-hover);
+      border-color: #3b4d6b;
+    }
 
-    /* Features Grid */
-    .features-section { padding: 60px 0; }
-    .section-title { text-align: center; margin-bottom: 40px; }
-    .section-title h2 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
-    .section-title p { color: var(--text-muted); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-    .card { background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius); padding: 28px; }
-    .card-icon { font-size: 2rem; margin-bottom: 16px; }
-    .card h3 { font-size: 1.2rem; margin-bottom: 10px; font-weight: 700; }
-    .card p { color: var(--text-muted); font-size: 0.95rem; }
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 72px 0 48px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--primary-light);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary-light);
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.18;
+      margin-bottom: 20px;
+      letter-spacing: -0.025em;
+      max-width: 840px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.22rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto 36px;
+      line-height: 1.65;
+    }
 
-    /* Terminal & Shortcuts */
-    .terminal-box { background: #0b0f19; border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 0.9rem; color: #38bdf8; margin: 16px 0; overflow-x: auto; }
-    .table-container { overflow-x: auto; margin-top: 24px; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 12px 16px; border-bottom: 1px solid var(--surface-border); font-size: 0.95rem; }
-    th { color: var(--text-muted); font-weight: 600; }
+    /* Primary CTAs */
+    .cta-group {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--primary);
+      color: #111827;
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.22);
+      transition: background 0.15s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 13px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border: 1px solid var(--surface-border);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      border-color: #3b4d6b;
+    }
+
+    /* Terminal Snippet */
+    .cli-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #060911;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88rem;
+      color: var(--accent-cyan);
+      margin-top: 8px;
+    }
+    .cli-box .prompt {
+      color: var(--text-subtle);
+      user-select: none;
+    }
+    .cli-box .cmd {
+      color: #e2e8f0;
+    }
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-subtle);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .copy-btn:hover {
+      color: var(--text);
+    }
+
+    /* Showcase Window Frame */
+    .showcase {
+      margin: 48px auto 64px;
+      max-width: 820px;
+    }
+    .window-frame {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.6);
+    }
+    .window-header {
+      background: #0e1626;
+      border-bottom: 1px solid var(--surface-border);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #334155;
+    }
+    .window-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 5px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--surface-card);
+      border-color: var(--surface-border);
+      color: var(--text);
+    }
+    .window-body {
+      background: #090d16;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 36px 20px;
+      min-height: 420px;
+    }
+    .window-body img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: block;
+    }
+
+    /* Features Section */
+    .section {
+      padding: 64px 0;
+      border-top: 1px solid var(--surface-border);
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-title h2 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      border-color: #3b4d6b;
+    }
+    .icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--primary-light);
+    }
+    .feature-card h3 {
+      font-size: 1.18rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    /* Gallery Walkthrough */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .gallery-item {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .gallery-img-wrap {
+      background: #090d16;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--surface-border);
+      min-height: 250px;
+    }
+    .gallery-img-wrap img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+    .gallery-caption {
+      padding: 20px;
+      flex: 1;
+    }
+    .gallery-caption h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .gallery-caption p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Shortcuts Table */
+    .table-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--surface-border);
+      font-size: 0.92rem;
+    }
+    th {
+      background: #111a2a;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    kbd {
+      display: inline-block;
+      padding: 3px 8px;
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+    }
+    .download-link {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+    .download-link:hover {
+      text-decoration: underline;
+    }
 
     /* Footer */
-    footer { border-top: 1px solid var(--surface-border); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 60px; }
+    footer {
+      border-top: 1px solid var(--surface-border);
+      padding: 48px 0;
+      margin-top: 72px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.3rem; }
+      .hero p { font-size: 1.05rem; }
+      .nav-links { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .cta-group { flex-direction: column; align-items: stretch; }
+      .btn-primary, .btn-secondary { justify-content: center; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
+  <header>
+    <div class="container">
       <nav class="nav">
-        <a href="#" class="logo-group">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32">
-            <defs>
-              <linearGradient id="pGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fff991"/>
-                <stop offset="100%" stop-color="#f5d12a"/>
-              </linearGradient>
-            </defs>
-            <path d="M 28 18 L 104 18 C 110 18, 112 20, 112 26 L 112 102 C 112 108, 110 110, 104 110 L 50 110 C 42 104, 36 94, 38 84 C 28 86, 20 80, 20 74 L 20 26 C 20 20, 22 18, 28 18 Z" fill="url(#pGrad)" stroke="#d4a508" stroke-width="3"/>
-            <g stroke="#221d06" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
-              <polyline points="46,49 65,64 46,79"/>
-              <line x1="75" y1="79" x2="92" y2="79"/>
-            </g>
-          </svg>
-          StickyShell Home
+        <a href="#" class="brand">
+          <img src="icon.png" alt="StickyShell App Icon">
+          <span>StickyShell Home</span>
         </a>
         <div class="nav-links">
           <a href="#features" class="nav-link">Features</a>
+          <a href="#walkthrough" class="nav-link">Screenshots</a>
           <a href="#shortcuts" class="nav-link">Shortcuts</a>
-          <a href="https://github.com/RadnusD/stickyshell-home/releases/tag/v1.1.0" class="btn-gh" target="_blank">
-            Release v1.1.0
+          <a href="#downloads" class="nav-link">Downloads</a>
+          <a href="https://github.com/RadnusD/stickyshell-home" class="btn-gh" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
           </a>
         </div>
       </nav>
-    </header>
+    </div>
+  </header>
 
+  <main class="container">
     <!-- Hero -->
     <section class="hero">
-      <div class="hero-badge">⚡ Version 1.1.0 Released</div>
-      <h1>Desktop Sticky Notes Meet <span>Instant Shell Execution</span></h1>
-      <p>A fast, lightweight desktop note-taking app that doubles as an instant command-line scratchpad. Built with Tauri v2 & Rust for speed and 100% offline privacy.</p>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Version 1.1.0 Released
+      </div>
+      <h1>Desktop sticky notes with built-in <span>command execution</span></h1>
+      <p>A fast scratchpad for developers and power users. Write notes, execute shell commands inline or in a system console, and keep everything stored locally on your machine.</p>
 
-      <div class="downloads-grid">
-        <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64-setup.exe" class="btn-dl">
-          <span>🪟</span> Download for Windows (.exe)
+      <div class="cta-group">
+        <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64-setup.exe" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+          </svg>
+          Download for Windows (.exe)
         </a>
-        <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_universal.dmg" class="btn-dl-sub">
-          <span>🍏</span> macOS (.dmg)
+        <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_universal.dmg" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.13.65-2.79 1.43-.59.67-1.11 1.76-.98 2.82 1.07.08 2.16-.58 2.76-1.38z"/>
+          </svg>
+          macOS (.dmg)
         </a>
-        <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_amd64.AppImage" class="btn-dl-sub">
-          <span>🐧</span> Linux (.AppImage)
+        <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_amd64.AppImage" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/>
+          </svg>
+          Linux (.AppImage)
         </a>
       </div>
-      <div class="terminal-box" style="max-width: 460px; margin: 24px auto 0; text-align: left;">
-        <span style="color: #64748b;"># Install with Windows Package Manager</span><br>
-        <span style="color: #f59e0b;">&gt;</span> winget install StickyShell
+
+      <div>
+        <div class="cli-box">
+          <span class="prompt">$</span>
+          <span class="cmd" id="winget-cmd">winget install StickyShell</span>
+          <button class="copy-btn" id="copy-btn" title="Copy command" onclick="copyWinget()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 14px;">Also available: <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64_en-US.msi" style="color: var(--accent);">Windows MSI</a> • <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_amd64.deb" style="color: var(--accent);">Linux DEB</a> • <a href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home-1.1.0-1.x86_64.rpm" style="color: var(--accent);">Linux RPM</a></p>
+    </section>
+
+    <!-- Showcase Frame -->
+    <section class="showcase">
+      <div class="window-frame">
+        <div class="window-header">
+          <div class="window-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="window-tabs">
+            <button class="tab-btn active" onclick="switchTab('output', this)">Command Output</button>
+            <button class="tab-btn" onclick="switchTab('note', this)">Sticky Note</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">Settings</button>
+          </div>
+          <div style="width: 50px;"></div>
+        </div>
+        <div class="window-body">
+          <img id="preview-img" src="screenshots/stickyshell-output.png" alt="StickyShell Output View">
+        </div>
+      </div>
     </section>
 
     <!-- Features -->
-    <section id="features" class="features-section">
+    <section id="features" class="section">
       <div class="section-title">
-        <h2>Engineered for Focus & Productivity</h2>
-        <p>Everything you need in a quick note without opening a heavy IDE.</p>
+        <h2>Designed for Developer Workflows</h2>
+        <p>A focused utility built to execute commands and store notes without IDE overhead.</p>
       </div>
 
-      <div class="grid">
-        <div class="card">
-          <div class="card-icon">⚡</div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"></polyline>
+              <line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+          </div>
           <h3>Dual Execution Modes</h3>
-          <p>Run commands in <strong>Inline Capture (Ctrl+Enter)</strong> mode with a slide-out drawer, or pop open an interactive <strong>External Console (Ctrl+Shift+Enter)</strong>.</p>
+          <p>Run commands quietly in Inline Capture mode (Ctrl+Enter) with output rendered in an attached drawer, or pop open an external system terminal (Ctrl+Shift+Enter).</p>
         </div>
 
-        <div class="card">
-          <div class="card-icon">🛡️</div>
+        <div class="feature-card">
+          <div class="icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+          </div>
           <h3>Persistent Undo Buffer</h3>
-          <p>Accidentally closed a note? Press <strong>Ctrl+Z</strong> to instantly restore your deleted notes and commands, even after closing the app.</p>
+          <p>Accidentally closed a note? Press Ctrl+Z to restore deleted notes with complete state and history, preserved across application restarts.</p>
         </div>
 
-        <div class="card">
-          <div class="card-icon">🔒</div>
-          <h3>100% Offline & Private</h3>
-          <p>Zero telemetry, zero cloud tracking, zero accounts. All notes and settings remain strictly on your local hard drive in standard JSON.</p>
+        <div class="feature-card">
+          <div class="icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3>Offline and Private</h3>
+          <p>Zero telemetry, zero external network calls, and no accounts. Notes and settings remain on your local disk in standard JSON format.</p>
         </div>
 
-        <div class="card">
-          <div class="card-icon">📌</div>
-          <h3>Always on Top & Global Hotkeys</h3>
-          <p>Pin notes to float above your active workspace. Toggle all notes instantly with <code>Win + Alt + S</code> or spawn a new note with <code>Win + Alt + N</code>.</p>
+        <div class="feature-card">
+          <div class="icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="17" x2="12" y2="22"></line>
+              <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
+            </svg>
+          </div>
+          <h3>Always on Top and Global Hotkeys</h3>
+          <p>Pin notes to float above editors and browser windows. Toggle visibility instantly with Win+Alt+S or create a note anywhere with Win+Alt+N.</p>
         </div>
 
-        <div class="card">
-          <div class="card-icon">📐</div>
-          <h3>Markdown & KaTeX Math</h3>
-          <p>Write formatted notes, task checklists, and complex mathematical formulas with built-in instant LaTeX rendering.</p>
+        <div class="feature-card">
+          <div class="icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16v3.5L12 14l8 6.5V24H4v-3.5L12 14 4 7.5V4z"></path>
+            </svg>
+          </div>
+          <h3>Markdown and Math Support</h3>
+          <p>Write formatted notes, task checklists, and mathematical expressions with built-in instant KaTeX formula rendering.</p>
         </div>
 
-        <div class="card">
-          <div class="card-icon">🚀</div>
-          <h3>Sub-Millisecond Speed</h3>
-          <p>Powered by Tauri v2 and Rust. Uses negligible memory, launches instantly, and consumes practically zero background CPU.</p>
+        <div class="feature-card">
+          <div class="icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <h3>Lightweight Footprint</h3>
+          <p>Built with Tauri v2 and Rust. Starts quickly, consumes minimal memory, and avoids running heavy background browser processes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Walkthrough Gallery -->
+    <section id="walkthrough" class="section">
+      <div class="section-title">
+        <h2>Interface Walkthrough</h2>
+        <p>Simple by default, powerful when executing tasks.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <div class="gallery-img-wrap">
+            <img src="screenshots/stickyshell-note.png" alt="Note scratchpad interface">
+          </div>
+          <div class="gallery-caption">
+            <h4>1. Note Scratchpad</h4>
+            <p>Write notes, track quick tasks, and type shell commands in a familiar sticky note interface.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="gallery-img-wrap">
+            <img src="screenshots/stickyshell-output.png" alt="Inline command execution output drawer">
+          </div>
+          <div class="gallery-caption">
+            <h4>2. Inline Execution Drawer</h4>
+            <p>Execute with Ctrl+Enter to inspect stdout, stderr, and exit status directly beneath the note.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="gallery-img-wrap">
+            <img src="screenshots/stickyshell-settings.png" alt="StickyShell Settings Panel">
+          </div>
+          <div class="gallery-caption">
+            <h4>3. Settings and Shell Options</h4>
+            <p>Customize working directories, terminal launchers (CMD, PowerShell, Bash), and startup options.</p>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Shortcuts -->
-    <section id="shortcuts" class="features-section">
+    <section id="shortcuts" class="section">
       <div class="section-title">
         <h2>Keyboard Shortcuts</h2>
-        <p>Control StickyShell without ever leaving your keyboard.</p>
+        <p>Operate StickyShell quickly without touching your mouse.</p>
       </div>
 
-      <div class="table-container">
+      <div class="table-card">
         <table>
           <thead>
             <tr>
               <th>Shortcut</th>
               <th>Action</th>
+              <th>Scope</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><code>Win + Alt + S</code></td>
+              <td><kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd></td>
               <td>Toggle (Show / Hide) all open sticky notes</td>
+              <td>Global OS</td>
             </tr>
             <tr>
-              <td><code>Win + Alt + N</code></td>
-              <td>Create a new sticky note</td>
+              <td><kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd></td>
+              <td>Spawn a new sticky note</td>
+              <td>Global OS</td>
             </tr>
             <tr>
-              <td><code>Ctrl + Enter</code></td>
+              <td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td>
               <td>Execute command (Inline Capture Mode)</td>
+              <td>Active Note</td>
             </tr>
             <tr>
-              <td><code>Ctrl + Shift + Enter</code></td>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd></td>
               <td>Execute command (External System Console)</td>
+              <td>Active Note</td>
             </tr>
             <tr>
-              <td><code>Ctrl + Z</code></td>
+              <td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td>
               <td>Undo delete (Restores closed note)</td>
+              <td>Active / Tray</td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <footer>
-      <p>StickyShell Home • Copyright &copy; 2026 StickyShell / RadnusD. All rights reserved.</p>
-    </footer>
-  </div>
+    <!-- Downloads Matrix -->
+    <section id="downloads" class="section">
+      <div class="section-title">
+        <h2>Download Packages</h2>
+        <p>Available for Windows, macOS, and Linux.</p>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Format</th>
+              <th>Architecture</th>
+              <th>Download</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Windows 10 / 11</td>
+              <td>Setup (.exe)</td>
+              <td>64-bit (x64)</td>
+              <td><a class="download-link" href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64-setup.exe">Download .exe</a></td>
+            </tr>
+            <tr>
+              <td>Windows 10 / 11</td>
+              <td>MSI Installer (.msi)</td>
+              <td>64-bit (x64)</td>
+              <td><a class="download-link" href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64_en-US.msi">Download .msi</a></td>
+            </tr>
+            <tr>
+              <td>macOS 11+</td>
+              <td>Disk Image (.dmg)</td>
+              <td>Universal (Apple Silicon & Intel)</td>
+              <td><a class="download-link" href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_universal.dmg">Download .dmg</a></td>
+            </tr>
+            <tr>
+              <td>Linux</td>
+              <td>AppImage</td>
+              <td>64-bit (x86_64)</td>
+              <td><a class="download-link" href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_amd64.AppImage">Download .AppImage</a></td>
+            </tr>
+            <tr>
+              <td>Linux (Debian / Ubuntu)</td>
+              <td>Debian Package (.deb)</td>
+              <td>64-bit (amd64)</td>
+              <td><a class="download-link" href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_amd64.deb">Download .deb</a></td>
+            </tr>
+            <tr>
+              <td>Linux (Fedora / RHEL)</td>
+              <td>RPM Package (.rpm)</td>
+              <td>64-bit (x86_64)</td>
+              <td><a class="download-link" href="https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home-1.1.0-1.x86_64.rpm">Download .rpm</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/RadnusD/stickyshell-home">Source Code</a>
+        <a href="https://github.com/RadnusD/stickyshell-home/releases">Releases</a>
+        <a href="https://github.com/RadnusD/stickyshell-home/issues">Issues</a>
+        <a href="https://github.com/RadnusD/stickyshell-home/blob/main/LICENSE">License (MIT)</a>
+      </div>
+      <p>StickyShell Home. Open source software licensed under the MIT License.</p>
+    </div>
+  </footer>
+
+  <script>
+    const images = {
+      'output': 'screenshots/stickyshell-output.png',
+      'note': 'screenshots/stickyshell-note.png',
+      'settings': 'screenshots/stickyshell-settings.png'
+    };
+    function switchTab(view, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const img = document.getElementById('preview-img');
+      if (images[view]) {
+        img.src = images[view];
+      }
+    }
+    function copyWinget() {
+      const text = document.getElementById('winget-cmd').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        setTimeout(() => {
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+        }, 2000);
+      });
+    }
+  </script>
 </body>
 </html>
