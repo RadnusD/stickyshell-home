@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - master
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/pull_request_template.md'
     tags:
       - 'v*'
   workflow_dispatch:
