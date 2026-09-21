@@ -12,12 +12,19 @@ Pre-built binaries are available for Windows, macOS, and Linux:
 | :--- | :--- | :--- | :--- |
 | Windows | Setup Installer (.exe) | 64-bit (x64) | [Download Setup (.exe)](../../releases/latest) |
 | Windows | MSI Package (.msi) | 64-bit (x64) | [Download MSI (.msi)](../../releases/latest) |
-| Windows | Standalone (.exe) | 64-bit (x64) | [Download Standalone (.exe)](../../releases/latest) |
 | macOS | Disk Image (.dmg) | Universal (Apple Silicon & Intel) | [Download DMG (.dmg)](../../releases/latest) |
 | Linux | Debian Package (.deb) | 64-bit (amd64) | [Download DEB (.deb)](../../releases/latest) |
 | Linux | AppImage | 64-bit (x86_64) | [Download AppImage](../../releases/latest) |
 
 You can also find all release files on the [GitHub Releases](../../releases) page.
+
+---
+
+## Screenshots
+
+| Note Scratchpad | Inline Command Output | Settings & Preferences |
+| :---: | :---: | :---: |
+| ![Note Scratchpad](docs/screenshots/stickyshell-note.png) | ![Inline Command Output](docs/screenshots/stickyshell-output.png) | ![Settings & Preferences](docs/screenshots/stickyshell-settings.png) |
 
 ---
 
