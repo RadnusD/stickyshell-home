@@ -1,0 +1,64 @@
+name: Bug Report
+description: File a report for a defect or unexpected behavior in StickyShell Home
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the fields below so we can reproduce and investigate the issue.
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: Platform running StickyShell
+      options:
+        - Windows 11 (64-bit)
+        - Windows 10 (64-bit)
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Linux (Ubuntu / Debian)
+        - Linux (Fedora / RedHat)
+        - Linux (Arch / Other)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: StickyShell Version
+      placeholder: e.g. 1.1.0
+      value: "1.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Description of the Problem
+      description: Clear explanation of what went wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to reproduce the behavior.
+      placeholder: |
+        1. Open note
+        2. Enter command '...'
+        3. Press Ctrl+Enter
+        4. Observe behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen instead.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: System Diagnostics
+      description: Diagnostic output copied from Settings -> About -> Copy Diagnostics.
+      render: markdown

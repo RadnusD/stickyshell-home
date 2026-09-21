@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: StickyShell Documentation
+    url: https://github.com/RadnusD/stickyshell-home#readme
+    about: Review installation instructions, configuration, and keyboard shortcuts.
+  - name: Community Discussions
+    url: https://github.com/RadnusD/stickyshell-home/discussions
+    about: Ask questions, share workflows, and discuss ideas with other users.
