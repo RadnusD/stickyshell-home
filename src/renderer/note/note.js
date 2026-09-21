@@ -1,5 +1,5 @@
 // StickyShell Home Edition - Note Controller
-// Clean, fast, lightweight note editor with native shell execution.
+// Clean, fast note editor with native shell execution.
 // Contains zero developer/pro evaluation code.
 
 document.addEventListener('DOMContentLoaded', async () => {

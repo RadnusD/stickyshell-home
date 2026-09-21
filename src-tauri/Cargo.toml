@@ -1,7 +1,7 @@
 [package]
 name = "stickyshell-home"
 version = "1.1.0"
-description = "StickyShell Home - Lightweight Cross-Platform Sticky Note"
+description = "StickyShell Home - Cross-Platform Sticky Note with Command Execution"
 authors = ["RadnusD"]
 edition = "2021"
 

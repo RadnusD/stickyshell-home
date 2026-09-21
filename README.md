@@ -1,6 +1,6 @@
 # StickyShell Home
 
-A lightweight desktop sticky note application that allows you to write notes and run shell commands directly from your desktop. Built with Tauri v2, Rust, and standard web technologies.
+A desktop sticky note application that allows you to write notes and run shell commands directly from your desktop. Built with Tauri v2, Rust, and standard web technologies.
 
 ---
 
