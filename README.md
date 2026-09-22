@@ -110,6 +110,10 @@ The installer binary has been analyzed on VirusTotal:
 
 StickyShell Home is completely open source and runs 100% offline without network connections or telemetry. You can inspect the source code in this repository or build the binaries from scratch using the build instructions above.
 
+### Code Signing Notice
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
 ### SHA-256 Checksums (v1.1.0)
 
 | Platform | File | SHA-256 Checksum |

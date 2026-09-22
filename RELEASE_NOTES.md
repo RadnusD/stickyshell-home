@@ -14,6 +14,7 @@
 
 - **VirusTotal Inspection**: [Clean Scan Report (SHA-256: f7d063174...)](https://www.virustotal.com/gui/file/f7d06317472d99aa937b01de43b885fbb5902debbcf074ca12e0d2df3205ce78/) — 68+ security vendors report 0 threats.
 - **Windows SmartScreen**: Because release binaries are unsigned open-source builds, Windows may display an Unknown Publisher prompt. Click **More info** -> **Run anyway** to launch.
+- **Code Signing**: Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 ### SHA-256 Checksums
 
