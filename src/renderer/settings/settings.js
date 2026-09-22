@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (window.stickyShellAPI && window.stickyShellAPI.getSystemDiagnostics) {
           diag = await window.stickyShellAPI.getSystemDiagnostics();
         } else {
-          diag = `### StickyShell Diagnostics\n- OS: ${navigator.userAgent}\n- App: StickyShell Home v1.0.0`;
+          diag = `### StickyShell Diagnostics\n- OS: ${navigator.userAgent}\n- App: StickyShell Home v1.1.0`;
         }
 
         if (navigator.clipboard && navigator.clipboard.writeText) {

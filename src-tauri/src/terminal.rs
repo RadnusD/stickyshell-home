@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Read;
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::sync::{Arc, Mutex};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -496,5 +498,162 @@ impl TerminalRunner {
                 duration_ms,
             })
         }
+    }
+
+    pub fn execute_streaming<F>(
+        _terminal_id: &str,
+        command: &str,
+        working_dir: Option<&str>,
+        on_chunk: F,
+    ) -> Result<ExecutionResult, String>
+    where
+        F: FnMut(String) + Send + 'static,
+    {
+        let start = Instant::now();
+        let default_dir = get_default_working_dir();
+        let mut target_dir = working_dir.unwrap_or(&default_dir);
+        if !std::path::Path::new(target_dir).exists() {
+            target_dir = &default_dir;
+        }
+
+        let is_multiline = command.contains('\n');
+
+        #[cfg(target_os = "windows")]
+        let (mut child, script_to_delete) = if is_multiline {
+            let script_path = create_temp_script(_terminal_id, command, false)?;
+            let script_str = script_path.to_string_lossy().to_string();
+            let mut cmd = if _terminal_id == "powershell" {
+                let mut c = Command::new("powershell.exe");
+                c.current_dir(target_dir);
+                c.args([
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    &script_str,
+                ]);
+                c
+            } else {
+                let mut c = Command::new("cmd.exe");
+                c.current_dir(target_dir);
+                c.args(["/c", &script_str]);
+                c
+            };
+            cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+            let child = cmd.spawn().map_err(|e| e.to_string())?;
+            (child, Some(script_path))
+        } else {
+            let mut cmd = if _terminal_id == "powershell" {
+                let mut c = Command::new("powershell.exe");
+                c.current_dir(target_dir);
+                c.args([
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-Command",
+                    command,
+                ]);
+                c
+            } else {
+                let mut c = Command::new("cmd.exe");
+                c.current_dir(target_dir);
+                c.args(["/c", command]);
+                c
+            };
+            cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+            let child = cmd.spawn().map_err(|e| e.to_string())?;
+            (child, None)
+        };
+
+        #[cfg(not(target_os = "windows"))]
+        let (mut child, script_to_delete) = if is_multiline {
+            let script_path = create_temp_script(_terminal_id, command, false)?;
+            let script_str = script_path.to_string_lossy().to_string();
+            let mut cmd = Command::new("bash");
+            cmd.current_dir(target_dir);
+            cmd.args([&script_str]);
+            cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+            let child = cmd.spawn().map_err(|e| e.to_string())?;
+            (child, Some(script_path))
+        } else {
+            let mut cmd = Command::new("bash");
+            cmd.current_dir(target_dir);
+            cmd.args(["-c", &format!("cd '{}' && {}", target_dir, command)]);
+            cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+            let child = cmd.spawn().map_err(|e| e.to_string())?;
+            (child, None)
+        };
+
+        let stdout_pipe = child.stdout.take();
+        let stderr_pipe = child.stderr.take();
+
+        let chunk_callback = Arc::new(Mutex::new(on_chunk));
+        let collected_stdout = Arc::new(Mutex::new(Vec::new()));
+        let collected_stderr = Arc::new(Mutex::new(Vec::new()));
+
+        let stdout_handle = if let Some(mut out) = stdout_pipe {
+            let cb = chunk_callback.clone();
+            let coll = collected_stdout.clone();
+            Some(std::thread::spawn(move || {
+                let mut buf = [0u8; 1024];
+                while let Ok(n) = out.read(&mut buf) {
+                    if n == 0 {
+                        break;
+                    }
+                    let chunk_str = String::from_utf8_lossy(&buf[..n]).to_string();
+                    coll.lock().unwrap().extend_from_slice(&buf[..n]);
+                    if let Ok(mut cb_fn) = cb.lock() {
+                        cb_fn(chunk_str);
+                    }
+                }
+            }))
+        } else {
+            None
+        };
+
+        let stderr_handle = if let Some(mut err) = stderr_pipe {
+            let cb = chunk_callback.clone();
+            let coll = collected_stderr.clone();
+            Some(std::thread::spawn(move || {
+                let mut buf = [0u8; 1024];
+                while let Ok(n) = err.read(&mut buf) {
+                    if n == 0 {
+                        break;
+                    }
+                    let chunk_str = String::from_utf8_lossy(&buf[..n]).to_string();
+                    coll.lock().unwrap().extend_from_slice(&buf[..n]);
+                    if let Ok(mut cb_fn) = cb.lock() {
+                        cb_fn(chunk_str);
+                    }
+                }
+            }))
+        } else {
+            None
+        };
+
+        if let Some(h) = stdout_handle {
+            let _ = h.join();
+        }
+        if let Some(h) = stderr_handle {
+            let _ = h.join();
+        }
+
+        let status = child.wait().map_err(|e| e.to_string())?;
+
+        if let Some(sp) = script_to_delete {
+            let _ = fs::remove_file(sp);
+        }
+
+        let duration_ms = start.elapsed().as_millis();
+        let stdout = String::from_utf8_lossy(&collected_stdout.lock().unwrap()).to_string();
+        let stderr = String::from_utf8_lossy(&collected_stderr.lock().unwrap()).to_string();
+        let exit_code = status.code().unwrap_or(0);
+
+        Ok(ExecutionResult {
+            stdout,
+            stderr,
+            exit_code,
+            duration_ms,
+        })
     }
 }

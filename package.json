@@ -12,7 +12,8 @@
     "test": "node test/test-core.js"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0"
+    "@tauri-apps/cli": "^2.0.0",
+    "terser": "^5.51.2"
   },
   "dependencies": {
     "katex": "^0.18.7"

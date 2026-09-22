@@ -12,8 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Header Buttons
   const btnNewNote = document.getElementById('btn-new-note');
-  const btnRun = document.getElementById('btn-run');
-  const btnRunOpts = document.getElementById('btn-run-opts');
   const btnPin = document.getElementById('btn-pin');
   const btnDelete = document.getElementById('btn-delete');
   const btnMenu = document.getElementById('btn-menu');
@@ -69,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let saveTimeout = null;
   let toastTimeout = null;
   let availableTerminals = [];
+  let lastFocusedArea = 'editor';
 
   function adjustEditorHeight() {
     if (!noteEditorArea || !noteTextarea || !outputWrapper) return;
@@ -319,23 +318,90 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const isCapture = radioModeCapture && radioModeCapture.checked;
 
+  function applyOutputChunk(currentText, newChunk) {
+    if (!newChunk.includes('\r')) {
+      return currentText + newChunk;
+    }
+    let buffer = currentText;
+    for (let i = 0; i < newChunk.length; i++) {
+      const ch = newChunk[i];
+      if (ch === '\r') {
+        if (i + 1 < newChunk.length && newChunk[i + 1] === '\n') {
+          buffer += '\n';
+          i++;
+        } else {
+          // Standalone \r: rewind to last newline
+          const lastNl = buffer.lastIndexOf('\n');
+          if (lastNl === -1) {
+            buffer = '';
+          } else {
+            buffer = buffer.substring(0, lastNl + 1);
+          }
+        }
+      } else {
+        buffer += ch;
+      }
+    }
+    return buffer;
+  }
+
     if (isCapture) {
       showStatus('Running...');
       try {
-        const result = await window.stickyShellAPI.executeAndCapture({
-          terminalId: selectedTerminalId,
-          command: cmdToRun,
-          customFolder: activeFolder || null
-        });
+        if (outputWrapper) outputWrapper.classList.remove('hidden');
+        if (noteOutputPre) noteOutputPre.textContent = '';
+        if (outputStatusPill) {
+          outputStatusPill.textContent = 'Running';
+          outputStatusPill.className = 'output-status-pill';
+        }
+        adjustEditorHeight();
+
+        let hasReceivedChunk = false;
+        let unlistenChunk = null;
+
+        if (window.stickyShellAPI && typeof window.stickyShellAPI.onCommandOutputChunk === 'function') {
+          unlistenChunk = await window.stickyShellAPI.onCommandOutputChunk((event) => {
+            const payload = event && event.payload ? event.payload : event;
+            const text = (payload && payload.text) || '';
+            if (!text) return;
+            hasReceivedChunk = true;
+            if (noteOutputPre) {
+              noteOutputPre.textContent = applyOutputChunk(noteOutputPre.textContent, text);
+              adjustEditorHeight();
+              noteOutputPre.scrollTop = noteOutputPre.scrollHeight;
+            }
+          });
+        }
+
+        let result;
+        const execFn = (window.stickyShellAPI && typeof window.stickyShellAPI.executeStreaming === 'function')
+          ? window.stickyShellAPI.executeStreaming
+          : window.stickyShellAPI.executeAndCapture;
+
+        try {
+          result = await execFn({
+            terminalId: selectedTerminalId,
+            command: cmdToRun,
+            customFolder: activeFolder || null
+          });
+        } finally {
+          if (typeof unlistenChunk === 'function') {
+            unlistenChunk();
+          }
+        }
 
         if (outputWrapper && noteOutputPre) {
-          outputWrapper.classList.remove('hidden');
-          const outputText = (result.stdout || '') + (result.stderr ? (result.stdout ? '\n' : '') + result.stderr : '');
-          noteOutputPre.textContent = outputText || '(No output)';
+          if (!hasReceivedChunk) {
+            const outputText = (result && result.stdout ? result.stdout : '') + (result && result.stderr ? (result.stdout ? '\n' : '') + result.stderr : '');
+            noteOutputPre.textContent = outputText || '(No output)';
+          } else if (!noteOutputPre.textContent.trim()) {
+            noteOutputPre.textContent = '(No output)';
+          }
 
           if (outputStatusPill) {
-            outputStatusPill.textContent = result.exitCode === 0 ? 'Success' : `Exit ${result.exitCode}`;
-            outputStatusPill.className = 'output-status-pill ' + (result.exitCode === 0 ? 'success' : 'error');
+            const code = result ? (result.exitCode !== undefined ? result.exitCode : 0) : 0;
+            outputStatusPill.textContent = code === 0 ? 'Success' : `Exit ${code}`;
+            outputStatusPill.className = 'output-status-pill ' + (code === 0 ? 'success' : 'error');
           }
 
           adjustEditorHeight();
@@ -370,10 +436,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Event Listeners: Run
-  if (btnRun) {
-    btnRun.addEventListener('click', handleRunCommand);
-  }
-
   if (menuRun) {
     menuRun.addEventListener('click', () => {
       dropdownMenu.classList.add('hidden');
@@ -388,14 +450,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Run Options Flyout Toggle
-  if (btnRunOpts) {
-    btnRunOpts.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dropdownMenu.classList.add('hidden');
-      runOptionsFlyout.classList.toggle('hidden');
+  noteTextarea.addEventListener('focus', () => {
+    lastFocusedArea = 'editor';
+  });
+  noteTextarea.addEventListener('pointerdown', () => {
+    lastFocusedArea = 'editor';
+  });
+
+  if (noteEditorArea) {
+    noteEditorArea.addEventListener('pointerdown', () => {
+      lastFocusedArea = 'editor';
     });
   }
+
+  // Run Options Flyout Toggle
 
   if (menuRunOpts) {
     menuRunOpts.addEventListener('click', (e) => {
@@ -561,9 +629,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Output Pane Controls
+  if (outputWrapper) {
+    outputWrapper.addEventListener('pointerdown', () => {
+      lastFocusedArea = 'output';
+    });
+  }
+
+  if (outputScrollPane) {
+    outputScrollPane.addEventListener('pointerdown', () => {
+      lastFocusedArea = 'output';
+    });
+  }
+
+  if (noteOutputPre) {
+    noteOutputPre.addEventListener('pointerdown', () => {
+      lastFocusedArea = 'output';
+    });
+  }
+
   if (btnCloseOutput) {
     btnCloseOutput.addEventListener('click', () => {
       outputWrapper.classList.add('hidden');
+      lastFocusedArea = 'editor';
       adjustEditorHeight();
     });
   }
@@ -582,7 +669,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!dropdownMenu.classList.contains('hidden') && !dropdownMenu.contains(e.target) && e.target !== btnMenu && (!btnMenu || !btnMenu.contains(e.target)) && (!btnFlyoutBack || !btnFlyoutBack.contains(e.target))) {
       dropdownMenu.classList.add('hidden');
     }
-    if (!runOptionsFlyout.classList.contains('hidden') && !runOptionsFlyout.contains(e.target) && (!btnRunOpts || !btnRunOpts.contains(e.target)) && (!menuRunOpts || !menuRunOpts.contains(e.target))) {
+    if (!runOptionsFlyout.classList.contains('hidden') && !runOptionsFlyout.contains(e.target) && (!menuRunOpts || !menuRunOpts.contains(e.target))) {
       runOptionsFlyout.classList.add('hidden');
     }
   });
@@ -727,6 +814,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
       e.preventDefault();
       togglePreviewMode();
+      return;
+    }
+
+    // Scoped Ctrl+A / Cmd+A selection
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+      const activeEl = document.activeElement;
+      const isInsideInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && activeEl !== noteTextarea;
+      if (isInsideInput) {
+        return;
+      }
+
+      e.preventDefault();
+      const isOutputVisible = outputWrapper && !outputWrapper.classList.contains('hidden');
+      const isInsideOutput = (outputWrapper && outputWrapper.contains(activeEl)) || lastFocusedArea === 'output';
+
+      if (isOutputVisible && isInsideOutput && noteOutputPre) {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          range.selectNodeContents(noteOutputPre);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      } else if (noteTextarea && !isPreview) {
+        lastFocusedArea = 'editor';
+        noteTextarea.focus();
+        noteTextarea.select();
+      } else if (isPreview && notePreview) {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          range.selectNodeContents(notePreview);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+      return;
     }
   });
 

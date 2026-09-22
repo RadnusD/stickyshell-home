@@ -14,6 +14,18 @@ use window_manager::WindowManager;
 const SINGLE_INSTANCE_PORT: u16 = 47921;
 
 pub fn run() {
+    #[cfg(all(target_os = "windows", not(debug_assertions)))]
+    {
+        extern "system" {
+            fn IsDebuggerPresent() -> i32;
+        }
+        unsafe {
+            if IsDebuggerPresent() != 0 {
+                std::process::exit(0);
+            }
+        }
+    }
+
     let listener = match std::net::TcpListener::bind(("127.0.0.1", SINGLE_INSTANCE_PORT)) {
         Ok(l) => l,
         Err(_) => {
@@ -98,65 +110,63 @@ pub fn run() {
             let app_handle_for_single_instance = app.handle().clone();
             std::thread::spawn(move || {
                 use std::io::{BufRead, BufReader};
-                for stream in listener.incoming() {
-                    if let Ok(stream) = stream {
-                        let mut reader = BufReader::new(stream);
-                        let mut line = String::new();
-                        let _ = reader.read_line(&mut line);
+                for stream in listener.incoming().flatten() {
+                    let mut reader = BufReader::new(stream);
+                    let mut line = String::new();
+                    let _ = reader.read_line(&mut line);
 
-                        let app_handle = app_handle_for_single_instance.clone();
-                        let store = match app_handle.try_state::<Arc<StoreManager>>() {
-                            Some(s) => s.inner().clone(),
-                            None => continue,
+                    let app_handle = app_handle_for_single_instance.clone();
+                    let store = match app_handle.try_state::<Arc<StoreManager>>() {
+                        Some(s) => s.inner().clone(),
+                        None => continue,
+                    };
+
+                    let all_notes = store.get_all_notes();
+                    if all_notes.is_empty() {
+                        let settings = store.get_settings();
+                        let new_id = uuid::Uuid::new_v4().to_string();
+                        let note = store::Note {
+                            id: new_id.clone(),
+                            title: Some("".to_string()),
+                            content: "".to_string(),
+                            terminal: Some(settings.default_terminal),
+                            custom_folder: settings.default_folder,
+                            run_mode: Some(settings.default_run_mode),
+                            x: None,
+                            y: None,
+                            width: Some(270.0),
+                            height: Some(220.0),
+                            is_pinned: Some(false),
+                            theme: Some("classic-yellow".to_string()),
+                            opacity: Some(100.0),
+                            created_at: None,
+                            updated_at: None,
                         };
-
-                        let all_notes = store.get_all_notes();
-                        if all_notes.is_empty() {
-                            let settings = store.get_settings();
-                            let new_id = uuid::Uuid::new_v4().to_string();
-                            let note = store::Note {
-                                id: new_id.clone(),
-                                title: Some("".to_string()),
-                                content: "".to_string(),
-                                terminal: Some(settings.default_terminal),
-                                custom_folder: settings.default_folder,
-                                run_mode: Some(settings.default_run_mode),
-                                x: None,
-                                y: None,
-                                width: Some(270.0),
-                                height: Some(220.0),
-                                is_pinned: Some(false),
-                                theme: Some("classic-yellow".to_string()),
-                                opacity: Some(100.0),
-                                created_at: None,
-                                updated_at: None,
-                            };
-                            store.save_note(note);
-                            let _ = WindowManager::spawn_note_window(
-                                &app_handle,
-                                &new_id,
-                                None,
-                                None,
-                                Some(270.0),
-                                Some(220.0),
-                            );
-                        } else {
-                            for note in all_notes {
-                                let label = format!("note-{}", note.id);
-                                if let Some(win) = app_handle.get_webview_window(&label) {
-                                    let _ = win.unminimize();
-                                    let _ = win.show();
-                                    let _ = win.set_focus();
-                                } else {
-                                    let _ = WindowManager::spawn_note_window(
-                                        &app_handle,
-                                        &note.id,
-                                        note.x,
-                                        note.y,
-                                        note.width,
-                                        note.height,
-                                    );
-                                }
+                        store.save_note(note);
+                        let _ = WindowManager::spawn_note_window(
+                            &app_handle,
+                            &new_id,
+                            None,
+                            None,
+                            Some(270.0),
+                            Some(220.0),
+                        );
+                    } else {
+                        for note in all_notes {
+                            let label = format!("note-{}", note.id);
+                            if let Some(win) = app_handle.get_webview_window(&label) {
+                                let _ = win.unminimize();
+                                let _ = win.show();
+                                let _ = win.set_focus();
+                            } else {
+                                let _ = WindowManager::spawn_note_window(
+                                    &app_handle,
+                                    &note.id,
+                                    note.x,
+                                    note.y,
+                                    note.width,
+                                    note.height,
+                                );
                             }
                         }
                     }
@@ -400,6 +410,7 @@ pub fn run() {
         get_available_terminals,
         run_in_terminal,
         execute_and_capture,
+        execute_streaming,
         pick_folder,
         get_edition_status,
         activate_license,
@@ -438,6 +449,7 @@ pub fn run() {
         get_available_terminals,
         run_in_terminal,
         execute_and_capture,
+        execute_streaming,
         pick_folder,
         get_edition_status,
         focus_note_window,

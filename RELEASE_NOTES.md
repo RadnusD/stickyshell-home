@@ -5,6 +5,7 @@
   - `Ctrl + Enter`: Inline capture mode with an expandable drawer and 1-click output copying.
   - `Ctrl + Shift + Enter`: Native external interactive console (CMD, PowerShell, or Bash).
 - **Always-on-Top & Custom Directories**: Pin notes above all windows and configure distinct working directories per note.
+- **Real-Time Synchronized Output**: Streaming command output with active progress reporting and live carriage-return line updates inside the expandable drawer.
 - **100% Offline & Private**: Zero telemetry, no cloud sync, and all notes stored locally in JSON format.
 
 ---

@@ -251,10 +251,10 @@ impl StoreManager {
                 if note.run_mode.is_none() { note.run_mode = existing.run_mode.clone(); }
                 if note.terminal.is_none() { note.terminal = existing.terminal.clone(); }
                 if note.created_at.is_none() { note.created_at = existing.created_at.clone(); }
-                if note.title.is_none() || note.title.as_deref() == Some("") {
-                    if existing.title.is_some() && existing.title.as_deref() != Some("") {
-                        note.title = existing.title.clone();
-                    }
+                if (note.title.is_none() || note.title.as_deref() == Some(""))
+                    && existing.title.as_ref().is_some_and(|t| !t.is_empty())
+                {
+                    note.title = existing.title.clone();
                 }
             }
             guard.notes.insert(note.id.clone(), note.clone());

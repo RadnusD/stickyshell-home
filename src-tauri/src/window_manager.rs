@@ -49,7 +49,7 @@ impl WindowManager {
             .decorations(false)
             .shadow(true)
             .initialization_script(init_script)
-            .devtools(true);
+            .devtools(cfg!(debug_assertions));
 
         let mut pos_x = x;
         let mut pos_y = y;
@@ -109,7 +109,7 @@ impl WindowManager {
         .decorations(true)
         .resizable(true)
         .center()
-        .devtools(true)
+        .devtools(cfg!(debug_assertions))
         .build()
         .map_err(|e| format!("Failed to create settings window: {}", e))?;
 

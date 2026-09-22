@@ -22,10 +22,11 @@ function minifyJs(content) {
       compress: {
         dead_code: true,
         drop_debugger: true,
+        drop_console: true,
         passes: 2
       },
       mangle: {
-        toplevel: false
+        toplevel: true
       },
       format: {
         comments: false

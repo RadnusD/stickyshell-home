@@ -211,7 +211,7 @@ pub fn get_available_terminals(
 }
 
 #[tauri::command]
-pub fn run_in_terminal(options: RunCommandOptions) -> Result<(), String> {
+pub async fn run_in_terminal(options: RunCommandOptions) -> Result<(), String> {
     TerminalRunner::run_in_external_terminal(
         &options.terminal_id,
         &options.command,
@@ -228,6 +228,24 @@ pub async fn execute_and_capture(
         &options.command,
         options.custom_folder.as_deref(),
     )
+}
+
+#[tauri::command]
+pub async fn execute_streaming(
+    window: WebviewWindow,
+    options: RunCommandOptions,
+) -> Result<ExecutionResult, String> {
+    let win = window.clone();
+    let res = TerminalRunner::execute_streaming(
+        &options.terminal_id,
+        &options.command,
+        options.custom_folder.as_deref(),
+        move |chunk| {
+            let _ = win.emit("command-output-chunk", serde_json::json!({ "text": chunk }));
+        },
+    )?;
+    let _ = window.emit("command-output-finished", &res);
+    Ok(res)
 }
 
 #[tauri::command]
@@ -484,16 +502,17 @@ pub async fn get_system_diagnostics(
     let default_dir = crate::terminal::get_default_working_dir();
     let now = chrono::Utc::now().to_rfc3339();
 
+    let version = env!("CARGO_PKG_VERSION");
     let diag = format!(
         "### StickyShell Diagnostics Report\n\
-         - **App Edition**: StickyShell Home Edition (v1.0.0)\n\
+         - **App Edition**: StickyShell Home Edition (v{})\n\
          - **OS Platform**: {} ({})\n\
          - **Default Shell**: {}\n\
          - **Default Run Mode**: {}\n\
          - **Default Working Dir**: {}\n\
          - **Active Notes**: {}\n\
          - **Timestamp**: {}\n",
-        os_info, arch_info, settings.default_terminal, settings.default_run_mode, default_dir, note_count, now
+        version, os_info, arch_info, settings.default_terminal, settings.default_run_mode, default_dir, note_count, now
     );
     Ok(diag)
 }

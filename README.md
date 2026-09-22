@@ -27,18 +27,6 @@ Install directly via the manifest URL:
 scoop install https://raw.githubusercontent.com/RadnusD/stickyshell-home/main/bucket/stickyshell.json
 ```
 
-Or add this repository as a custom bucket:
-```powershell
-scoop bucket add stickyshell https://github.com/RadnusD/stickyshell-home
-scoop install stickyshell
-```
-
-#### Windows Package Manager (WinGet)
-
-```powershell
-winget install RadnusD.StickyShell
-```
-
 ---
 
 ## Screenshots

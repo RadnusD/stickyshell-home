@@ -102,6 +102,15 @@
           customFolder: (options && (options.customFolder || options.cwd)) || null
         }
       }),
+      executeStreaming: (options) => invoke('execute_streaming', {
+        options: {
+          terminalId: (options && (options.terminalId || options.terminal)) || 'cmd',
+          command: (options && options.command) || '',
+          customFolder: (options && (options.customFolder || options.cwd)) || null
+        }
+      }),
+      onCommandOutputChunk: (callback) => listen('command-output-chunk', callback),
+      onCommandFinished: (callback) => listen('command-output-finished', callback),
       pickFolder: () => invoke('pick_folder'),
       getDefaultDirectory: () => invoke('get_default_working_directory'),
 
@@ -187,6 +196,13 @@
         stderr: '',
         exitCode: 0
       }),
+      executeStreaming: async (opts) => ({
+        stdout: `Executed in Home: ${opts && opts.command}`,
+        stderr: '',
+        exitCode: 0
+      }),
+      onCommandOutputChunk: () => () => {},
+      onCommandFinished: () => () => {},
       pickFolder: async () => null,
       getDefaultDirectory: async () => 'C:\\Users\\Default',
       getSettings: async () => ({
@@ -213,7 +229,7 @@
       }),
       setWindowSize: async () => {},
       openExternalUrl: async (url) => { if (typeof window !== 'undefined' && url) window.open(url, '_blank'); },
-      getSystemDiagnostics: async () => `### StickyShell Diagnostics Report (Mock)\n- OS: Browser Environment\n- Version: 1.0.0`,
+      getSystemDiagnostics: async () => `### StickyShell Diagnostics Report (Mock)\n- OS: Browser Environment\n- Version: 1.1.0`,
       onNoteLoaded: () => {},
       onTerminalsChanged: () => () => {}
     };
@@ -234,7 +250,8 @@
         e.key === 'F12' ||
         (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
         (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
-        (e.ctrlKey && (e.key === 'u' || e.key === 'U'))
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) ||
+        (e.metaKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S'))
       ) {
         e.preventDefault();
         e.stopPropagation();
