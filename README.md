@@ -104,7 +104,7 @@ When running newly released binaries on Windows:
 ### VirusTotal Inspection Report
 
 The installer binary has been analyzed on VirusTotal:
-- **Scan Report**: [VirusTotal Inspection (SHA-256: f7d063174...)](https://www.virustotal.com/gui/file/f7d06317472d99aa937b01de43b885fbb5902debbcf074ca12e0d2df3205ce78/)
+- **Scan Report**: [VirusTotal Inspection (SHA-256: abc419496...)](https://www.virustotal.com/gui/file/abc4194960bf53f3da2fa4777a19b5634dc16f572c256216d01eada0252a4e49/)
 - **Detection Results**: 68+ security vendors (including Kaspersky, Bitdefender, Malwarebytes, CrowdStrike, SentinelOne, and Symantec) report 0 threats.
 - **Heuristic Notes**: The 3 machine-learning flags (such as Sophos "Generic ML PUA") classify unsigned command-execution utilities as Potentially Unwanted Applications (PUA) by policy, not malicious payloads.
 
@@ -118,12 +118,10 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 
 | Platform | File | SHA-256 Checksum |
 | :--- | :--- | :--- |
-| Windows | `StickyShell.Home_1.1.0_x64-setup.exe` | `F7D06317472D99AA937B01DE43B885FBB5902DEBBCF074CA12E0D2DF3205CE78` |
-| Windows | `StickyShell.Home_1.1.0_x64_en-US.msi` | `795E3DCA950A530537A1517E82FF8A773815D93FFF8449A41581479F58772533` |
-| macOS | `StickyShell.Home_1.1.0_universal.dmg` | `9409332E803B5DDC8BCBEA0A66E550E61CA312E674F27483C714A1CAD1EBBA24` |
-| Linux | `StickyShell.Home_1.1.0_amd64.deb` | `1483836ABDAD4F7088BE50D0CB434605917F5979DC28B81F2429AC1124A816B4` |
-| Linux | `StickyShell.Home_1.1.0_amd64.AppImage` | `DB72F80581F36D6BB2E6FB4A9E46C4CFA556425ED607343AEA705ED892D15A8E` |
-| Linux | `StickyShell.Home-1.1.0-1.x86_64.rpm` | `CF98508DFC702FC6A9E74C196E2E47188551C0EEFEF2E74E547F84CC1D700E97` |
+| Windows | `StickyShell.Home_1.1.0_x64-setup.exe` | `ABC4194960BF53F3DA2FA4777A19B5634DC16F572C256216D01EADA0252A4E49` |
+| Windows | `StickyShell.Home_1.1.0_x64_en-US.msi` | `58026199B00B7719477A707E21CBE88F2B16654A97D0AAEA6978F82C4A08C7C9` |
+| macOS | `StickyShell.Home_1.1.0_universal.dmg` | `370F10DE79C7F97B8A65A006CC4F66C1B19ACFF8EFF6C1EA715D13E93C264911` |
+| Linux | `StickyShell.Home_1.1.0_amd64.deb` | `D385E762C66E3B2AC31152E1ACB69B8F53D00DFDEE40105CDB7D222CAB7E14F4` |
 
 ---
 
