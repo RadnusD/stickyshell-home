@@ -12,7 +12,7 @@
 
 ### Verification and Security
 
-- **VirusTotal Inspection**: [Clean Scan Report (SHA-256: 60c7a199c...)](https://www.virustotal.com/gui/file/60c7a199c1a5eb1024372f23948dc08faef4fd2c0d48bd49f5448b15e041b55f/) — 68+ security vendors report 0 threats.
+- **VirusTotal Inspection**: [Clean Scan Report (SHA-256: 60c7a199c...)](https://www.virustotal.com/gui/file/60c7a199c1a5eb1024372f23948dc08faef4fd2c0d48bd49f5448b15e041b55f/) — 69+ security vendors report 0 threats.
 - **Windows SmartScreen**: Because release binaries are unsigned open-source builds, Windows may display an Unknown Publisher prompt. Click **More info** -> **Run anyway** to launch.
 - **Code Signing**: Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 

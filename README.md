@@ -105,8 +105,8 @@ When running newly released binaries on Windows:
 
 The installer binary has been analyzed on VirusTotal:
 - **Scan Report**: [VirusTotal Inspection (SHA-256: 60c7a199c...)](https://www.virustotal.com/gui/file/60c7a199c1a5eb1024372f23948dc08faef4fd2c0d48bd49f5448b15e041b55f/)
-- **Detection Results**: 68+ security vendors (including Kaspersky, Bitdefender, Malwarebytes, CrowdStrike, SentinelOne, and Symantec) report 0 threats.
-- **Heuristic Notes**: The 3 machine-learning flags (such as Sophos "Generic ML PUA") classify unsigned command-execution utilities as Potentially Unwanted Applications (PUA) by policy, not malicious payloads.
+- **Detection Results**: 69+ security vendors (including Microsoft Defender, Kaspersky, Bitdefender, Malwarebytes, CrowdStrike, SentinelOne, and Symantec) report 0 threats.
+- **Heuristic Notes**: The 2 machine-learning flags (Cylance "Unsafe", APEX "Malicious") classify unsigned command-execution utilities as Potentially Unwanted Applications (PUA) by policy, not malicious payloads.
 
 StickyShell Home is completely open source and runs 100% offline without network connections or telemetry. You can inspect the source code in this repository or build the binaries from scratch using the build instructions above.
 
