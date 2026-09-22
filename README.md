@@ -104,7 +104,7 @@ When running newly released binaries on Windows:
 ### VirusTotal Inspection Report
 
 The installer binary has been analyzed on VirusTotal:
-- **Scan Report**: [VirusTotal Inspection (SHA-256: abc419496...)](https://www.virustotal.com/gui/file/abc4194960bf53f3da2fa4777a19b5634dc16f572c256216d01eada0252a4e49/)
+- **Scan Report**: [VirusTotal Inspection (SHA-256: 60c7a199c...)](https://www.virustotal.com/gui/file/60c7a199c1a5eb1024372f23948dc08faef4fd2c0d48bd49f5448b15e041b55f/)
 - **Detection Results**: 68+ security vendors (including Kaspersky, Bitdefender, Malwarebytes, CrowdStrike, SentinelOne, and Symantec) report 0 threats.
 - **Heuristic Notes**: The 3 machine-learning flags (such as Sophos "Generic ML PUA") classify unsigned command-execution utilities as Potentially Unwanted Applications (PUA) by policy, not malicious payloads.
 
@@ -118,10 +118,12 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 
 | Platform | File | SHA-256 Checksum |
 | :--- | :--- | :--- |
-| Windows | `StickyShell.Home_1.1.0_x64-setup.exe` | `ABC4194960BF53F3DA2FA4777A19B5634DC16F572C256216D01EADA0252A4E49` |
-| Windows | `StickyShell.Home_1.1.0_x64_en-US.msi` | `58026199B00B7719477A707E21CBE88F2B16654A97D0AAEA6978F82C4A08C7C9` |
-| macOS | `StickyShell.Home_1.1.0_universal.dmg` | `370F10DE79C7F97B8A65A006CC4F66C1B19ACFF8EFF6C1EA715D13E93C264911` |
-| Linux | `StickyShell.Home_1.1.0_amd64.deb` | `D385E762C66E3B2AC31152E1ACB69B8F53D00DFDEE40105CDB7D222CAB7E14F4` |
+| Windows | `StickyShell.Home_1.1.0_x64-setup.exe` | `60C7A199C1A5EB1024372F23948DC08FAEF4FD2C0D48BD49F5448B15E041B55F` |
+| Windows | `StickyShell.Home_1.1.0_x64_en-US.msi` | `8FDAF5FDD31F13553941DBE8EF2AF44F4772A7EEBDC942E9B72350F276C785EE` |
+| macOS | `StickyShell.Home_1.1.0_universal.dmg` | `0A1757D8BBB8BEADF41731C5BBB55ED3778A2D257044C9F4F70204112984C350` |
+| Linux | `StickyShell.Home_1.1.0_amd64.deb` | `54ABCCC1F4F4D6FDDFE9D3076B0D7470641A6CB8D4D2AE691D2D53F45BDD75FC` |
+| Linux | `StickyShell.Home_1.1.0_amd64.AppImage` | `6D6DF2BCFAE6D53A5715D9ACCBB48DBC73063304836DC6C76C6DEF8F2502E4EF` |
+| Linux | `StickyShell.Home-1.1.0-1.x86_64.rpm` | `40C3631D3A9F4D53B2E0F02E6E62FA2C106840FE1F6E809B8E920E544C0E402B` |
 
 ---
 

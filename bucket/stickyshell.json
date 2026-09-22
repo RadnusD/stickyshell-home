@@ -6,7 +6,7 @@
   "architecture": {
     "64bit": {
       "url": "https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64-setup.exe#/dl.7z",
-      "hash": "abc4194960bf53f3da2fa4777a19b5634dc16f572c256216d01eada0252a4e49"
+      "hash": "60c7a199c1a5eb1024372f23948dc08faef4fd2c0d48bd49f5448b15e041b55f"
     }
   },
   "pre_install": "Remove-Item \"$dir\\`$PLUGINSDIR\" -Recurse -Force -ErrorAction SilentlyContinue",
