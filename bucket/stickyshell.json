@@ -6,7 +6,7 @@
   "architecture": {
     "64bit": {
       "url": "https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64-setup.exe",
-      "hash": "424fabd654490988453be073b6aa1d75c886d99f77320714e201f392e440a7c6"
+      "hash": "f7d06317472d99aa937b01de43b885fbb5902debbcf074ca12e0d2df3205ce78"
     }
   },
   "bin": "stickyshell-home.exe",
