@@ -1,0 +1,27 @@
+{
+  "version": "1.1.0",
+  "description": "Desktop sticky notes with terminal and shell command execution",
+  "homepage": "https://github.com/RadnusD/stickyshell-home",
+  "license": "Apache-2.0",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/RadnusD/stickyshell-home/releases/download/v1.1.0/StickyShell.Home_1.1.0_x64-setup.exe",
+      "hash": "424fabd654490988453be073b6aa1d75c886d99f77320714e201f392e440a7c6"
+    }
+  },
+  "bin": "stickyshell-home.exe",
+  "shortcuts": [
+    [
+      "stickyshell-home.exe",
+      "StickyShell Home"
+    ]
+  ],
+  "checkver": "github",
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/RadnusD/stickyshell-home/releases/download/v$version/StickyShell.Home_$version_x64-setup.exe"
+      }
+    }
+  }
+}

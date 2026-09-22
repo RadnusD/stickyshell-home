@@ -18,6 +18,27 @@ Pre-built binaries are available for Windows, macOS, and Linux:
 
 You can also find all release files on the [GitHub Releases](../../releases) page.
 
+### Package Managers
+
+#### Scoop (Windows)
+
+Install directly via the manifest URL:
+```powershell
+scoop install https://raw.githubusercontent.com/RadnusD/stickyshell-home/main/bucket/stickyshell.json
+```
+
+Or add this repository as a custom bucket:
+```powershell
+scoop bucket add stickyshell https://github.com/RadnusD/stickyshell-home
+scoop install stickyshell
+```
+
+#### Windows Package Manager (WinGet)
+
+```powershell
+winget install RadnusD.StickyShell
+```
+
 ---
 
 ## Screenshots
